@@ -391,7 +391,7 @@ def main():
     # 检查按钮是否被按下
     if st.button('Clear Files'):
         # 定义要删除的文件路径（这里可以根据需要修改）
-        file_path = '\*png'
+        file_path = '*png'
         
         # 检查文件是否存在
         if os.path.exists(file_path):
