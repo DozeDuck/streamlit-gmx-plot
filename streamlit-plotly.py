@@ -4,7 +4,8 @@ import plotly.io as pio
 import re
 import tempfile
 import os
-
+import io
+import mimetypes
 file1 = ''
 file2 = ''
 file3 = ''
@@ -24,6 +25,10 @@ rscript = 0
 nbin = 500
 size = 400
 
+# buffer = io.BytesIO()
+# print(type(buffer))
+# print(buffer)
+
 
 class gmxplotly:
     flag = ''
@@ -42,7 +47,7 @@ class gmxplotly:
     average_value = []
     multi_flag = ''
     
-    def __init__(self,file1, file2, file3, output_name, renumber, ave, xaxis_name, yaxis_name, rdf_cutoff, multi_files, plot_name, pca, nbin, size):
+    def __init__(self, file1, file2, file3, output_name, renumber, ave, xaxis_name, yaxis_name, rdf_cutoff, multi_files, plot_name, pca, nbin, size):
             file1 = multi_files[0]
             self.flag_recognizer(file1)
             if self.pca_flag != 1:
@@ -73,12 +78,15 @@ class gmxplotly:
                         self.flag = 'distance'
                     elif self.flag == 'rdf,':
                         self.flag = 'rdf'
+                    elif self.flag == 'anaeig,':
+                        self.flag = 'pca'
                 except: pass
 
             if len(lines) >= 9 and '-or' in lines[8]:
                 self.sasa_flag = '-or'
                 
-            if 'pca' in str(file1).lower() or '2dproj' in str(file1):
+            # if 'pca' in str(file1).lower() or '2dproj' in str(file1):
+            if self.flag == 'pca':
                 self.pca_flag = 1
 
   
@@ -157,6 +165,9 @@ class gmxplotly:
                            width=800, height=600)
         fig = go.Figure(data=data, layout=layout)
         pio.write_image(fig, output_file_name)
+        # pio.write_image(fig, buffer, format="png") # 将图像写入 BytesIO 对象
+        # print(type(buffer))
+        # print(buffer)
         ################## if user ask for average the inputs ##################
         if ave == 'true':
             number = len(multi_files)
@@ -186,7 +197,9 @@ class gmxplotly:
                                width=800, height=600)
             fig = go.Figure(data=data, layout=layout)
             pio.write_image(fig, "Average_" + output_file_name)
-
+            # pio.write_image(fig, buffer, format="png") # 将图像写入 BytesIO 对象
+            # print(type(buffer))
+            # print(buffer)
     def plotly_pca(self, multi_files, xaxis_name, yaxis_name, renumber, ave, output_name, rdf_cutoff, plot_name, nbin, size):
         # 将您的原始函数放在这里
         x_points = []
@@ -225,6 +238,7 @@ class gmxplotly:
                         y_points.append(float(lines[num].split()[1])) 
                 
             # 创建散点图轨迹
+            # print(mode)
             scatter_trace = go.Scatter(
                 x=x_points,
                 y=y_points,
@@ -234,7 +248,8 @@ class gmxplotly:
                     color='black'
                 )
             )
-            
+            #print("###################################################")
+            #print(scatter_trace.mode)
             layout = go.Layout(title=plot_title, title_x=0.5, title_y=1, font=dict(size=20),
                                 xaxis=dict(title=x_name, titlefont=dict(size=20, color='black', family='Arial'), zeroline=False, autorange=True,
                                           showgrid=False, gridwidth=1, gridcolor='rgba(0,0,0,0.1)', tickfont=dict(size=20)),
@@ -251,11 +266,24 @@ class gmxplotly:
             # fig.show()
             if output_name == 'plotly.png':
                 pio.write_image(fig, "PCA_Scatter_"+i.split('.')[0]+".png")
+                #pio.write_image(fig, "plot.png")
             else:
-                pio.write_image(fig, "Scatter_" + output_name)
+                # pio.write_image(fig, "PCA_Scatter_" + output_name)
+                pio.write_image(fig, "PCA_Scatter_" + i.split('.')[0]+'_'+output_name.split('.')[0] + ".png")
+                #pio.write_image(fig, "plot.png")
+                
+            # 将图像写入 BytesIO 对象
+            # pio.write_image(fig, buffer, format="png") # 将图像写入 BytesIO 对象
+            # print(type(buffer))
+            # print(buffer)
+            # buffer.seek(0) # 移动到缓冲区的开始位置，以便读取图像数据
 
+            # # 清除 buffer 以便重复使用（如果需要）
+            # buffer.truncate(0)
+            # buffer.seek(0)
 # 创建Streamlit应用程序
 def main():
+    # st.cache(allow_output_mutation=True)
     st.title("Shang's first streamlit app!")  # 设置应用程序标题
     # 添加用户界面元素，例如文本框、文件上传、选择框等
     st.write("Welcome to the plotly for gromacs!!")
@@ -283,20 +311,83 @@ def main():
             # multi_files.append(temp_file_path)
             multi_files.append(file_name)
             # 打印临时文件的路径（可选）
-            st.write(f"已创建临时文件：{file_name}")    
+            st.write(f"Temporary files have been created：{file_name}")    
     else:
-        st.write("没有上传文件")
+        st.write("Haven't upload your data")
 
     # 添加用户界面元素
-    output_name = st.text_input("请输入输出文件名：")
+
+    output_name = st.text_input("Please give the filename for output:")
     # 当用户输入文件名并点击提交按钮时执行以下操作
-    if st.button("提交"):
-        if output_name:
-            st.write(f"您输入的输出文件名是：{output_name}")
-        else:
-            st.write("请输入输出文件名")
+
     ave = st.selectbox('Do you want to have the average?', ['true', 'fault'])
-    renumber = st.selectbox("请输入是否重新编号：", ['true', 'fault'])
+    renumber = st.selectbox("Do you want to renumber the sequence from 1?", ['true', 'fault'])
+    
+    st.button("提交")
+    # # 获取文件列表
+    # file_list = st.selectbox('Do you want to show the current folder?', ['true', 'fault'])
+    # if file_list == 'true':
+    #     folder_path='./'
+    #     files = os.listdir(folder_path)
+        
+    #     # 在 Streamlit 应用中展示文件列表
+    #     for file in files:
+    #         st.write(file)
+    
+    
+    # # Download files
+    # outputname = st.text_input("Please input the png file name, e.g plot.png ")
+    # if st.button("Submit"):
+    #     if output_name:
+    #         st.write(f"Your output filename is: {outputname}")
+    #     else:
+    #         st.write("Please input the filename for output")
+    # with open("plot.png", "rb") as file:
+    #     st.download_button(
+    #         label="Download Plot as PNG",
+    #         data=file,
+    #         file_name=outputname,
+    #         mime="image/png",
+    #     )
+    # with open("Average_plot.png", "rb") as file:
+    #     if file:
+    #         st.download_button(
+    #             label="Download Average Plot as PNG",
+    #             data=file,
+    #             file_name="Average_" + outputname,
+    #             mime="image/png",
+    #         )
+    
+    # 获取当前文件夹中的文件
+    folder_path = '.'  # 使用 '.' 代表当前文件夹       
+    files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
+    
+    # 让用户在 UI 中选择文件
+    selected_file = st.selectbox('Pick the file you want to download', files)
+    
+    # 获取文件的绝对路径
+    file_path = os.path.join(folder_path, selected_file)
+    
+    # 读取文件内容
+    with open(file_path, "rb") as file:
+        file_content = file.read()
+    
+    # 获取文件的 MIME 类型
+    mime_type, _ = mimetypes.guess_type(file_path)
+    
+    # 创建下载按钮
+    download_button = st.download_button(
+        label=f"Download {selected_file}",
+        data=file_content,
+        file_name=selected_file,
+        mime=mime_type,
+    )
+
+    # 如果用户点击下载按钮，显示一条消息
+    if download_button:
+        st.write(f"You have donwloaded {selected_file}")
+
+
 
     # 创建一个实例
     app = gmxplotly(file1,file2,file3, output_name, renumber, ave, xaxis_name, yaxis_name, rdf_cutoff, multi_files, plot_name, pca, nbin, size)
