@@ -394,8 +394,6 @@ def main():
     # 删除临时文件
     for i in multi_files:
         os.remove(i)
-        for i in multi_files:
-        os.remove(i)
         
     # 检查按钮是否被按下
     if st.button('Clear Files'):
