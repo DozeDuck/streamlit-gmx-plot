@@ -394,6 +394,21 @@ def main():
     # 删除临时文件
     for i in multi_files:
         os.remove(i)
+        for i in multi_files:
+        os.remove(i)
+        
+    # 检查按钮是否被按下
+    if st.button('Clear Files'):
+        # 定义要删除的文件路径（这里可以根据需要修改）
+        file_path = '*png'
+        
+        # 检查文件是否存在
+        if os.path.exists(file_path):
+            # 删除文件
+            os.remove(file_path)
+            st.write(f"File {file_path} has been removed!")
+        else:
+            st.write(f"File {file_path} does not exist!")
 
 
 
