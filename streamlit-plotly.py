@@ -388,13 +388,6 @@ def main():
         st.write(f"You have donwloaded {selected_file}")
 
 
-
-    # 创建一个实例
-    app = gmxplotly(file1,file2,file3, output_name, renumber, ave, xaxis_name, yaxis_name, rdf_cutoff, multi_files, plot_name, pca, nbin, size)
-    # 删除临时文件
-    for i in multi_files:
-        os.remove(i)
-        
     # 检查按钮是否被按下
     if st.button('Clear Files'):
         # 定义要删除的文件路径（这里可以根据需要修改）
@@ -407,6 +400,14 @@ def main():
             st.write(f"File {file_path} has been removed!")
         else:
             st.write(f"File {file_path} does not exist!")
+            
+    # 创建一个实例
+    app = gmxplotly(file1,file2,file3, output_name, renumber, ave, xaxis_name, yaxis_name, rdf_cutoff, multi_files, plot_name, pca, nbin, size)
+    # 删除临时文件
+    for i in multi_files:
+        os.remove(i)
+        
+
 
 
 
