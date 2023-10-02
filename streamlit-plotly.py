@@ -323,7 +323,7 @@ def main():
     ave = st.selectbox('Do you want to have the average?', ['true', 'fault'])
     renumber = st.selectbox("Do you want to renumber the sequence from 1?", ['true', 'fault'])
     
-    st.button("提交")
+    st.button("Submit")
     # # 获取文件列表
     # file_list = st.selectbox('Do you want to show the current folder?', ['true', 'fault'])
     # if file_list == 'true':
