@@ -1,4 +1,6 @@
 import streamlit as st
+#from streamlit.report_thread import ReportThread
+#from streamlit.server.server import Server
 import plotly.graph_objects as go
 import plotly.io as pio
 import re
@@ -6,6 +8,7 @@ import tempfile
 import os
 import io
 import mimetypes
+import glob
 file1 = ''
 file2 = ''
 file3 = ''
@@ -227,6 +230,7 @@ class gmxplotly:
         for i in multi_files:
             x_points=[]
             y_points=[]
+            labels = []
             # create empty list
             with open(i, "r") as f:
                 lines = f.readlines()
@@ -236,31 +240,37 @@ class gmxplotly:
                     else:
                         x_points.append(float(lines[num].split()[0]))
                         y_points.append(float(lines[num].split()[1])) 
+                        labels.append(num)
                 
-            # 创建散点图轨迹
-            # print(mode)
-            scatter_trace = go.Scatter(
+            # 创建一个 Scatter 对象
+            scatter = go.Scatter(
                 x=x_points,
                 y=y_points,
                 mode='markers',
                 marker=dict(
-                    size=5,
-                    color='black'
-                )
+                    color=labels,  # 设置颜色为标签的数值
+                    colorscale='rainbow',  # 颜色映射，你可以根据需要选择不同的颜色映射
+                    colorbar=dict(title='Frame Index'),  # 添加颜色条
+                ),
             )
-            #print("###################################################")
-            #print(scatter_trace.mode)
-            layout = go.Layout(title=plot_title, title_x=0.5, title_y=1, font=dict(size=20),
-                                xaxis=dict(title=x_name, titlefont=dict(size=20, color='black', family='Arial'), zeroline=False, autorange=True,
-                                          showgrid=False, gridwidth=1, gridcolor='rgba(0,0,0,0.1)', tickfont=dict(size=20)),
-                                yaxis=dict(title=y_name, titlefont=dict(size=20, color='black', family='Arial'), zeroline=False, autorange=True,
-                                          showgrid=False, gridwidth=1, gridcolor='rgba(0,0,0,0.1)', tickfont=dict(size=20)),
-                                legend=dict(x=1, y=1, orientation='v', font=dict(size=30)), showlegend=False,
-                                plot_bgcolor='rgba(255, 255, 255, 0.1)',
-                                paper_bgcolor='rgba(255, 255, 255, 0.2)')
-            
-            # 创建图形对象
-            fig = go.Figure(data=scatter_trace, layout=layout)
+
+            # 创建数据列表
+            data = [scatter]
+
+            # 创建布局
+            layout = go.Layout(
+                title='PCA plot with Color Bar for frame order', title_x=0.5, title_y=1, font=dict(size=24),
+                xaxis=dict(title='PC1 (nm)', titlefont=dict(size=40, color='black', family='Arial'), zeroline=False, autorange=True,
+                           showgrid=True, gridwidth=1, gridcolor='rgba(235,240,248,100)', tickfont=dict(size=30)),
+                yaxis=dict(title='PC2 (nm)', titlefont=dict(size=40, color='black', family='Arial'), zeroline=False, autorange=True,
+                           showgrid=True, gridwidth=1, gridcolor='rgba(235,240,248,100)', tickfont=dict(size=30)),
+                plot_bgcolor='rgba(255, 255, 255, 0.1)',
+                paper_bgcolor='rgba(255, 255, 255, 0.2)',
+                width=800, height=600
+            )
+
+            # 创建 Figure 对象
+            fig = go.Figure(data=data, layout=layout)
                     
             # 显示图形
             # fig.show()
@@ -268,8 +278,8 @@ class gmxplotly:
                 pio.write_image(fig, "PCA_Scatter_"+i.split('.')[0]+".png")
                 #pio.write_image(fig, "plot.png")
             else:
-                # pio.write_image(fig, "PCA_Scatter_" + output_name)
-                pio.write_image(fig, "PCA_Scatter_" + i.split('.')[0]+'_'+output_name.split('.')[0] + ".png")
+                pio.write_image(fig, "PCA_Scatter_" + output_name)
+                # pio.write_image(fig, "PCA_Scatter_" + i.split('.')[0] + ".png")
                 #pio.write_image(fig, "plot.png")
                 
             # 将图像写入 BytesIO 对象
@@ -314,7 +324,6 @@ def main():
             st.write(f"Temporary files have been created：{file_name}")    
     else:
         st.write("Haven't upload your data")
-
     # 添加用户界面元素
 
     output_name = st.text_input("Please give the filename for output:")
@@ -358,10 +367,28 @@ def main():
     #             mime="image/png",
     #         )
     
+
+
+
+
+            
+    # 创建一个实例
+    app = gmxplotly(file1,file2,file3, output_name, renumber, ave, xaxis_name, yaxis_name, rdf_cutoff, multi_files, plot_name, pca, nbin, size)
+    
+    ##### 删除临时文件 #####
+    for i in multi_files:
+        try:
+            os.remove(i)        
+            st.write(f"File {i} has been removed!")
+        except Exception as e:
+            st.write(e)
+
+    ######## Download files #########
     # 获取当前文件夹中的文件
     folder_path = '.'  # 使用 '.' 代表当前文件夹       
-    files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
-    
+    # files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
+    # 获取文件列表，只列出后缀为.png的文件
+    files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f)) and f.endswith(".png")]
     # 让用户在 UI 中选择文件
     selected_file = st.selectbox('Pick the file you want to download', files)
     
@@ -386,9 +413,11 @@ def main():
     # 如果用户点击下载按钮，显示一条消息
     if download_button:
         st.write(f"You have donwloaded {selected_file}")
+        os.remove(selected_file)
+        st.write(f"File {selected_file} has been removed!")
 
 
-    if st.button('Clear PNG Files'):
+    if st.button('Clear uploaded and generated Files'):
     # 获取当前目录下的所有 .png 文件
         for file in glob.glob("*.png"):
             try:
@@ -397,14 +426,12 @@ def main():
                 st.write(f"File {file} has been removed!")
             except Exception as e:
                 st.write(e)
-            
-    # 创建一个实例
-    app = gmxplotly(file1,file2,file3, output_name, renumber, ave, xaxis_name, yaxis_name, rdf_cutoff, multi_files, plot_name, pca, nbin, size)
-    # 删除临时文件
-    for i in multi_files:
-        os.remove(i)
-        
 
+
+    # 刷新应用程序以清除上传的文件列表
+    #st.cache_resource.clear()
+    # st.experimental_rerun()
+    st.cache_data.clear()
 
 
 
