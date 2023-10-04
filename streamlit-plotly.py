@@ -294,7 +294,7 @@ class gmxplotly:
 # 创建Streamlit应用程序
 def main():
     # st.cache(allow_output_mutation=True)
-    st.title("Shang's first streamlit app!")  # 设置应用程序标题
+    st.title("Gromacs xvg files plotter!")  # 设置应用程序标题
     # 添加用户界面元素，例如文本框、文件上传、选择框等
     st.write("Welcome to the plotly for gromacs!!")
 
