@@ -373,8 +373,10 @@ def main():
 
             
     # 创建一个实例
-    app = gmxplotly(file1,file2,file3, output_name, renumber, ave, xaxis_name, yaxis_name, rdf_cutoff, multi_files, plot_name, pca, nbin, size)
-    
+    try:
+        app = gmxplotly(file1,file2,file3, output_name, renumber, ave, xaxis_name, yaxis_name, rdf_cutoff, multi_files, plot_name, pca, nbin, size)
+    except:
+        pass
     ##### 删除临时文件 #####
     for i in multi_files:
         try:
