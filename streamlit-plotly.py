@@ -398,7 +398,7 @@ def main():
     try:
         file_path = os.path.join(folder_path, selected_file)
     except:
-        pass
+        pass 
     # 读取文件内容
     with open(file_path, "rb") as file:
         file_content = file.read()
