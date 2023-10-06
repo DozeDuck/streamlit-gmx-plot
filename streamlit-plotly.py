@@ -395,8 +395,10 @@ def main():
     selected_file = st.selectbox('Pick the file you want to download', files)
     
     # 获取文件的绝对路径
-    file_path = os.path.join(folder_path, selected_file)
-    
+    try:
+        file_path = os.path.join(folder_path, selected_file)
+    except:
+        pass
     # 读取文件内容
     with open(file_path, "rb") as file:
         file_content = file.read()
