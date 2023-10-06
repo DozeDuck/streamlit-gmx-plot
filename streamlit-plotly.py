@@ -278,8 +278,8 @@ class gmxplotly:
                 pio.write_image(fig, "PCA_Scatter_"+i.split('.')[0]+".png")
                 #pio.write_image(fig, "plot.png")
             else:
-                pio.write_image(fig, "PCA_Scatter_" + output_name)
-                # pio.write_image(fig, "PCA_Scatter_" + i.split('.')[0] + ".png")
+                # pio.write_image(fig, "PCA_Scatter_" + output_name)
+                pio.write_image(fig, "PCA_Scatter_" + i.split('.')[0] + ".png")
                 #pio.write_image(fig, "plot.png")
                 
             # 将图像写入 BytesIO 对象
