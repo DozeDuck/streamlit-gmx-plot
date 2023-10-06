@@ -397,28 +397,28 @@ def main():
     # 获取文件的绝对路径
     try:
         file_path = os.path.join(folder_path, selected_file)
+        # 读取文件内容
+        with open(file_path, "rb") as file:
+            file_content = file.read()
+        
+        # 获取文件的 MIME 类型
+        mime_type, _ = mimetypes.guess_type(file_path)
+        
+        # 创建下载按钮
+        download_button = st.download_button(
+            label=f"Download {selected_file}",
+            data=file_content,
+            file_name=selected_file,
+            mime=mime_type,
+        )
+    
+        # 如果用户点击下载按钮，显示一条消息
+        if download_button:
+            st.write(f"You have donwloaded {selected_file}")
+            os.remove(selected_file)
+            st.write(f"File {selected_file} has been removed!")
     except:
-        pass 
-    # 读取文件内容
-    with open(file_path, "rb") as file:
-        file_content = file.read()
-    
-    # 获取文件的 MIME 类型
-    mime_type, _ = mimetypes.guess_type(file_path)
-    
-    # 创建下载按钮
-    download_button = st.download_button(
-        label=f"Download {selected_file}",
-        data=file_content,
-        file_name=selected_file,
-        mime=mime_type,
-    )
-
-    # 如果用户点击下载按钮，显示一条消息
-    if download_button:
-        st.write(f"You have donwloaded {selected_file}")
-        os.remove(selected_file)
-        st.write(f"File {selected_file} has been removed!")
+        pass
 
 
     if st.button('Clear uploaded and generated Files'):
