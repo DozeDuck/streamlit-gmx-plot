@@ -326,7 +326,7 @@ def main():
         st.write("Haven't upload your data")
     # 添加用户界面元素
 
-    output_name = st.text_input("Please give the filename for output:")
+    output_name = st.text_input("Please give the filename for output, e.g: rmsf.png")
     # 当用户输入文件名并点击提交按钮时执行以下操作
 
     ave = st.selectbox('Do you want to have the average?', ['true', 'fault'])
