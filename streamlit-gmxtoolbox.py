@@ -269,7 +269,7 @@ class plotly_go():
         plot_title, x_name, y_name = self.extract_plot_details(multi_files, plot_name, xaxis_name, yaxis_name, flag, histogram)
         # 读取数据并创建迹线
         for i, file in enumerate(multi_files):
-            x_data, y_data, _ = self.read_data(file, xaxis_name, renumber)
+            x_data, y_data, _ = self.read_data(file, x_name, renumber)
             trace = self.define_trace(x_data, y_data, uploaded_filenames[i], Plotly[i % len(Plotly)])
             data.append(trace)
 
