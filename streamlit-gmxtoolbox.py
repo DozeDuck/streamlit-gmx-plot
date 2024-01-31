@@ -278,6 +278,10 @@ class plotly_go():
                 histogram_data.append(y_data)
                 group_labels.append(str(uploaded_filenames[i]).split('.')[0])
 
+        # change Time (ps) to Time (ns)
+        if x_name == 'Time (ps)':
+            x_name = 'Time (ns)'
+
         # 设置布局
         layout = self.setup_layout(plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t ,b)
 
