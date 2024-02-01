@@ -191,7 +191,7 @@ class plotly_go():
         if flag == 'pca':
             legend_show = False
         layout = go.Layout(
-            title=plot_title, title_x=0.5, title_y=1, font=dict(size=title_font, color=font_color),
+            title=plot_title, title_x=0.5, title_y=0.99, font=dict(size=title_font, color=font_color),
             xaxis=dict(title=x_name, titlefont=dict(size=xy_font, color=font_color, family=font_family), zeroline=False, autorange=True,
                        showgrid=grid_show, gridwidth=1, gridcolor='rgba(235,240,248,100)', tickfont=dict(size=30)),
             yaxis=dict(title=y_name, titlefont=dict(size=xy_font, color=font_color, family=font_family), zeroline=False, autorange=True,
