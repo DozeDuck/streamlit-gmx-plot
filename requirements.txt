@@ -1,3 +1,5 @@
 streamlit
 plotly
 kaleido
+mdanalysis
+
