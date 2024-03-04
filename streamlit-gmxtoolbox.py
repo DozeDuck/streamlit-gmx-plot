@@ -821,10 +821,53 @@ class contact_map_detect(): # read uploaded files
     
 ##########################################################################################################################################################################################
 
+class pep2lig(): 
+    pdb     = ''
+    pepname = ''
+    chain   = 'A'
+    resnum  = 1
+    output_file = '/tmp/modified_pep.pdb'
+    
+    def __init__(self, pdb, pepname):
+        self.pdb = pdb
+        self.pepname = pepname
+        self.converter(pdb, pepname, self.chain, self.resnum, self.output_file)
+        
+    def streamlit_download_file(self, download_name, content_file):
+        # Download topol.top file  #      
+        # 打开 content_file 文件并读取其内容
+        with open(content_file, 'r') as top_file:
+            content = top_file.read()
+        
+        # 添加一个下载按钮，传递 receptor_top_content 作为文件内容
+        st.download_button(
+            label = "Download " +  download_name,
+            data = content,
+            key = download_name,
+            file_name = download_name
+            )
+    def converter(self, pdb, pepname, chain, resnum, output_file):
+        try:
+            with open(pdb, 'r') as infile, open(output_file, 'w') as outfile:
+                for line in infile:
+                    if line.startswith("ATOM"):
+                        parts = line.split()
+                        if not parts[4].isdigit():  # Original script checks for non-digit in $5, which is index 4 in zero-based indexing
+                            formatted_line = f"{parts[0]:<6}{int(parts[1]):5}  {parts[2]:<4}{pepname:>3} {chain}{resnum:>4}    {float(parts[6]):8.3f}{float(parts[7]):8.3f}{float(parts[8]):8.3f}{float(parts[9]):6.2f}{float(parts[10]):6.2f}          {parts[11]:>2}\n"
+                        else:
+                            formatted_line = f"{parts[0]:<6}{int(parts[1]):5}  {parts[2]:<4}{pepname:>3} {chain}{parts[4]:>4}    {float(parts[5]):8.3f}{float(parts[6]):8.3f}{float(parts[7]):8.3f}{float(parts[8]):6.2f}{float(parts[9]):6.2f}          {parts[10]:>2}\n"
+                        outfile.write(formatted_line)                     
+        
+        except:
+            pass
+        
+        self.streamlit_download_file("modified_peptide.pdb", output_file)
+##########################################################################################################################################################################################
+
 # Title
 st.title("Welcome to gmx tool box")
 
-# 创建3栏布局
+# 创建4栏布局
 plot, mradder, gromerge, contact_map = st.columns(4)
 
 # 保存文件并获取临时文件路径
@@ -959,5 +1002,28 @@ with contact_map:
             st.error("Failed to generate Ligand contact map.")
     else:
         pass
-        
+
+    
+    ### subcolum in column 4, for peptide convert to ligand ###
+    contact_map.subheader("Peptide to Ligand")
+    p2l_pdb = st.file_uploader("Upload the Peptide pdb file", type=['pdb'])
+    p2l_name =  st.text_input("Give the peptide a name", 'PEP') 
+    # save the files name:
+    if p2l_pdb and p2l_name:
+        peptide_pdb = p2l_pdb.name
+    # 保存上传的文件到临时位置
+    if st.button('convert') and p2l_pdb and p2l_name:
+        # 保存文件并获取临时文件路径
+        peptide_pdb_path = save_uploaded_file(p2l_pdb)
+        # 如果文件保存成功，则进行合并
+        if peptide_pdb_path:
+            # with open(receptor_gro_path, 'r') as file:
+                # file_content = file.read()
+                # st.text(file_content)
+            x = pep2lig(peptide_pdb_path, p2l_name)
+            # st.success("Peptide converted successfully!")
+        else:
+            st.error("Failed to convert the Peptide, do you have the last column (atom type column) in you peptide PDB?")
+    else:
+        pass           
 #################################################################################################################################################
