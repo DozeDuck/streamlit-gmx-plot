@@ -975,7 +975,7 @@ with gromerge:
 
 # 在第4栏中添加内容
 with contact_map:
-    st.header("Ligand contact map")
+    st.header("ligand contact map")
     cm_topol_top = st.file_uploader("Upload the topology file", type=['gro', 'top', 'pdb', 'tpr'])
     cm_trajectory_pdb = st.file_uploader("Upload the trajectory pdb file", type=['xtc', 'trr', 'pdb'])
     cm_ligand_name = st.text_input("ligand res name", 'LIG')
