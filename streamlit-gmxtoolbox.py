@@ -826,12 +826,65 @@ class pep2lig():
     pepname = ''
     chain   = 'A'
     resnum  = 1
-    output_file = '/tmp/modified_pep.pdb'
-    
+    atomic_index        = []
+    atomic_name         = []
+    residue_name        = []
+    chain_name          = []
+    residue_index       = []
+    X_peratom           = []
+    Y_peratom           = []
+    Z_peratom           = []
+    bfactor_per_factor  = []
+    temp_factor         = []
+    Atomtype_per_atom   = []
     def __init__(self, pdb, pepname):
         self.pdb = pdb
         self.pepname = pepname
-        self.converter(pdb, pepname, self.chain, self.resnum, self.output_file)
+        self.converter(pdb, pepname, self.chain, self.resnum)
+        self.PDBwriter("/tmp/modified_PEP.pdb")
+        
+    def converter(self, pdb, pepname, chain, resnum):
+            with open(pdb, 'r') as infile:
+                for line in infile:                                                              # iterate each line in file "f"                     
+                        if(line.split()[0] in["ATOM","HETATM"]):       # Judgment Sentence，Used to split each row and then determine whether the first column of the row == ATOM or HETATM
+                            self.atomic_index.append(int(line[6:11].strip()))                # The second column is the atomic number
+                            self.atomic_name.append(line[12:16].strip())                        # The 3rd column is the atom name C CA CD1 CD2 and so on
+                            # self.residue_name.append(line[17:20].strip())                       # Column 4 is the residue name TYR ALA etc.
+                            self.residue_name.append(pepname)
+                            # self.chain_name.append(line[21].strip())                         # The 5th column is the name of the chain it is on
+                            self.chain_name.append(chain)
+                            # self.residue_index.append(int(line[22:26].strip()))               # The sixth column is the residue number
+                            self.residue_index.append(resnum)
+                            self.X_peratom.append(float(line[30:38].strip()))
+                            self.Y_peratom.append(float(line[38:46].strip()))
+                            self.Z_peratom.append(float(line[46:54].strip()))
+                            self.bfactor_per_factor.append(float(line[54:60].strip()) if line[54:60].strip() else 0.0)
+                            self.temp_factor.append(float(line[60:66].strip()) if line[60:66].strip() else 0.0 )
+                            try:
+                                self.Atomtype_per_atom.append(line[76:78].strip())
+                            except:
+                                self.Atomtype_per_atom.append(" ")              
+        
+    def PDBwriter(self,filename):
+        f = open(filename, "w")                                                             # e.g: f = linesplit[0]+"_PO3.pdb"
+        for i in range (0 ,len(self.atomic_index)):                                         # Create a loop, i is a sequence starting from 0, and the number of atoms is the length  
+            print("%4s%7d  %-4s%1s%2s%4d    %8.3f%8.3f%8.3f%6.2f%6.2f%12s" %  ("ATOM" ,     # Formatted output, %4s, right-aligned, the output occupies 4 columns in total. If the length is less than 4 columns, the left end will be filled with spaces. If it is greater than 4 columns, the actual length will be output as a string
+                                             self.atomic_index[i],                          # %7d, right-aligned, the output occupies a total of 7 columns, if the length is less than 7 columns, the left end is filled with spaces, signed decimal certificate integer
+                                             self.atomic_name[i],                           # %-4s, left-aligned, the output occupies a total of 4 columns, if the length is less than 4 columns, the right end is filled with spaces, if it is greater than 4 columns, the actual length is output as a string
+                                             self.residue_name[i],                          # %1s, right-aligned, the output occupies a total of 1 column. If it is less than 1 column, it will be filled with spaces from the left end. If it is greater than 1 column, the actual length will be output as a string
+                                             "A",                            # %2s, right-aligned, the output occupies 2 columns in total. If it is less than 2 columns, it will be filled with spaces from the left end. If it is greater than 2 columns, the actual length will be output as a string
+                                             self.residue_index[i],                         # %4d, right-aligned, the output occupies a total of 4 columns, if the length is less than 4 columns, the left end is filled with spaces, a signed decimal certificate integer
+                                             self.X_peratom[i],                             # %8.3f, right-aligned, the output occupies a total of 8 columns, including 3 decimal places, if the width of the value is less than 8, fill in a space at the left end, decimal
+                                             self.Y_peratom[i],                             # %8.3f, right-aligned, the output occupies a total of 8 columns, including 3 decimal places, if the width of the value is less than 8, fill in a space at the left end, decimal
+                                             self.Z_peratom[i],                             # %8.3f, right-aligned, the output occupies a total of 8 columns, including 3 decimal places, if the width of the value is less than 8, fill in a space at the left end, decimal
+                                             self.bfactor_per_factor[i],                    # %6.2f, right-aligned, the output occupies a total of 6 columns, including 2 decimal places, if the width of the value is less than 6, fill in a space at the left end, decimal
+                                             self.temp_factor[i],                     # %6.2f, right-aligned, the output occupies a total of 6 columns, including 2 decimal places, if the width of the value is less than 6, fill in a space at the left end, decimal
+                                             self.Atomtype_per_atom[i]), file = f )         # %12s, right-aligned, the output occupies a total of 12 columns, if it is less than 12 columns, it will be filled with spaces from the left end
+        print("END", file = f)
+        f.close()
+        
+        self.streamlit_download_file("modified_peptide.pdb", filename)
+
         
     def streamlit_download_file(self, download_name, content_file):
         # Download topol.top file  #      
@@ -846,22 +899,6 @@ class pep2lig():
             key = download_name,
             file_name = download_name
             )
-    def converter(self, pdb, pepname, chain, resnum, output_file):
-        try:
-            with open(pdb, 'r') as infile, open(output_file, 'w') as outfile:
-                for line in infile:
-                    if line.startswith("ATOM"):
-                        parts = line.split()
-                        if not parts[4].isdigit():  # Original script checks for non-digit in $5, which is index 4 in zero-based indexing
-                            formatted_line = f"{parts[0]:<6}{int(parts[1]):5}  {parts[2]:<4}{pepname:>3} {chain}{resnum:>4}    {float(parts[6]):8.3f}{float(parts[7]):8.3f}{float(parts[8]):8.3f}{float(parts[9]):6.2f}{float(parts[10]):6.2f}          {parts[11]:>2}\n"
-                        else:
-                            formatted_line = f"{parts[0]:<6}{int(parts[1]):5}  {parts[2]:<4}{pepname:>3} {chain}{parts[4]:>4}    {float(parts[5]):8.3f}{float(parts[6]):8.3f}{float(parts[7]):8.3f}{float(parts[8]):6.2f}{float(parts[9]):6.2f}          {parts[10]:>2}\n"
-                        outfile.write(formatted_line)                     
-        
-        except:
-            pass
-        
-        self.streamlit_download_file("modified_peptide.pdb", output_file)
 ##########################################################################################################################################################################################
 
 # Title
