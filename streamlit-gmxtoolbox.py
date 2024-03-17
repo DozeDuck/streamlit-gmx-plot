@@ -68,7 +68,7 @@ class plotly_go():
                 self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b)
 
 
-    def flag_recognizer(self,file1):                                                   # first method to be called in __main__, used for creating object and charactors.
+    def flag_recognizer(self,file1, plot_name):                                                   # first method to be called in __main__, used for creating object and charactors.
         flags_map = {
             'rms,': 'rmsd',
             'rmsf,': 'rmsf',
