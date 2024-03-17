@@ -110,7 +110,7 @@ class plotly_go():
         elif file1.endswith(".csv"):
             found = False
             for key in flags_map:
-                if key.strip(',') in a:  # 使用strip去除可能的逗号后，检查键是否在字符串a中
+                if key.strip(',') in plot_name.lower():  # 使用strip去除可能的逗号后，检查键是否在字符串a中
                     found = True
                     self.flag = flags_map[key]  # 假设self.flag需要被设置为找到的第一个匹配项对应的字典值
                     break  # 找到第一个匹配项后即退出循环
