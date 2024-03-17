@@ -359,7 +359,7 @@ class plotly_go():
 
         # 处理直方图
         if histogram == 'true':
-            self.plot_histogram(histogram_data, group_labels, plot_title, "/tmp/" + output_name, Plotly, nbin)
+            self.plot_histogram(histogram_data, group_labels, plot_title, output_name, Plotly, nbin)
 
         # 处理平均值
         if average == 'true':
