@@ -418,7 +418,7 @@ class plotly_go():
             for i, trace in enumerate(traces_name_list):
                 x_data, y_data, _ = self.read_data(multi_files[0], "PC1", renumber)
                 labels = [x for x in range(len(y_data[i]))]
-                trace = self.define_trace(x_data, y_data[i], file, 'rainbow', flag=flag, labels=labels)
+                trace = self.define_trace(x_data, y_data[i], multi_files[0], 'rainbow', flag=flag, labels=labels)
                 data.append(trace)
         # 使用 setup_layout 设置布局
         layout = self.setup_layout(plot_title, title_font, 'PC1 (nm)', 'PC2 (nm)', xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t ,b, flag=flag)
