@@ -247,9 +247,11 @@ class plotly_go():
                 ),
             )
         elif flag =='pca' and smooth == 'true':
-            trace = go.Heatmap(z=x_data, showscale=False, connectgaps=True, zsmooth='best')
+            trace = go.Heatmap(z=x_data, colorscale='Viridis', showscale=True, connectgaps=True, zsmooth='best', x=[-180, -120, -60, 60, 120,180], y=[-180, -120, -60, 60, 120,180])
         elif violine != 'False':
             trace = go.Violin(x0=str(file_name).split('.')[0], y=y_data, line=dict(color='black'), fillcolor=colour, name=str(file_name).split('.')[0], box_visible=True, meanline_visible=True, opacity=0.6)            
+        elif smooth == 'true':
+            trace = go.Heatmap(z=x_data, colorscale='Viridis', showscale=True, connectgaps=True, zsmooth='best', x=[-180, -120, -60, 60, 120,180], y=[-180, -120, -60, 60, 120,180])
         else:
             trace = go.Scatter(x=x_data, y=y_data, line=dict(color=colour), name=str(file_name).split('.')[0])
         return trace
@@ -289,7 +291,13 @@ class plotly_go():
         for x, y in data:
             x_idx = np.digitize(x, x_bins) - 1
             y_idx = np.digitize(y, y_bins) - 1
+
+            # 确保索引不超出density_matrix的范围
+            x_idx = min(x_idx, n_bins - 1)
+            y_idx = min(y_idx, n_bins - 1)
+
             density_matrix[y_idx, x_idx] += 1  # 注意矩阵的索引和坐标系的方向
+
         return density_matrix
     def streamlit_download_file_plotly(self, download_name, content_file):
         # 读取文件内容
@@ -420,8 +428,6 @@ class plotly_go():
         # layout = self.setup_layout(plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show)
         # self.plot_graph(data, layout, output_name)
 
-
-         
             
     def plotly_pca(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l, r, t ,b, smooth):
         data = []
@@ -429,8 +435,11 @@ class plotly_go():
         # labels = []
         # 使用 extract_plot_details 方法获取图表标题和轴标签
         plot_title, x_name, y_name, traces_name_list = self.extract_plot_details(multi_files, plot_name, xaxis_name, yaxis_name, flag, histogram)
-
-        # 处理 PCA 数据
+        if xaxis_name == 'auto detect':
+            x_name = 'PC1 (nm)'
+        if xaxis_name == 'auto detect':
+            x_name = 'PC2 (nm)'
+    # 处理 PCA 数据
         if smooth != 'true':
             if multi_files[0].endswith(".xvg"):
                 for i, file in enumerate(multi_files):          
@@ -446,25 +455,27 @@ class plotly_go():
                     labels = [x for x in range(len(y_data[i]))]
                     trace = self.define_trace(x_data, y_data[i], multi_files[0], 'rainbow', flag=flag, labels=labels)
                     data.append(trace)
+            layout = self.setup_layout(plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t ,b, flag=flag)
+
         elif smooth == 'true':
             if multi_files[0].endswith(".xvg"):
                 for i, file in enumerate(multi_files):          
                     x_data, y_data, _ = self.read_data(file, "PC1", renumber)  # 假设 "PC1" 和 "PC2" 是合适的轴名称
-                    data = [list(pair) for pair in zip(x_data, y_data[i])]
-                    density_matrix = self.pca_bins_density_define(nbin, data)
+                    points = [list(pair) for pair in zip(x_data, y_data[i])]
+                    density_matrix = self.pca_bins_density_define(nbin, points)
                     # 使用 define_trace 创建迹线
                     trace = self.define_trace(density_matrix, density_matrix, file, 'rainbow', flag=flag, smooth=smooth)  # 假设使用 'rainbow' 作为颜色
                     data.append(trace)
             elif multi_files[0].endswith(".csv"):
                 for i, trace in enumerate(traces_name_list):
                     x_data, y_data, _ = self.read_data(multi_files[0], "PC1", renumber)
-                    data = [list(pair) for pair in zip(x_data, y_data[i])]
-                    density_matrix = self.pca_bins_density_define(nbin, data)
+                    points = [list(pair) for pair in zip(x_data, y_data[0])]
+                    density_matrix = self.pca_bins_density_define(nbin, points)
                     trace = self.define_trace(density_matrix, density_matrix, multi_files[0], 'rainbow', flag=flag, smooth=smooth)
                     data.append(trace)
-            data = [list(pair) for pair in zip(x_data, y_data)]
-        # 使用 setup_layout 设置布局
-        layout = self.setup_layout(plot_title, title_font, 'PC1 (nm)', 'PC2 (nm)', xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t ,b, flag=flag)
+            # 使用 setup_layout 设置布局
+            layout = self.setup_layout(plot_title, title_font, xaxis_name, yaxis_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t ,b, flag=flag)
+  
 
         # 使用 plot_graph 绘制图形
         self.plot_graph(data, layout, "Scatter_" + output_name)
