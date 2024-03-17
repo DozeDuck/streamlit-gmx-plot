@@ -408,8 +408,10 @@ class plotly_go():
         # 处理 PCA 数据
         for i, file in enumerate(multi_files):          
             x_data, y_data, _ = self.read_data(file, "PC1", renumber)  # 假设 "PC1" 和 "PC2" 是合适的轴名称
-            # st.text(y_data)
+            st.text(x_data)
+            st.text(y_data)
             labels = [x for x in range(len(y_data))]
+            st.text(labels)
             
             # 使用 define_trace 创建迹线
             trace = self.define_trace(x_data, y_data, file, 'rainbow', flag=flag, labels=labels)  # 假设使用 'rainbow' 作为颜色
