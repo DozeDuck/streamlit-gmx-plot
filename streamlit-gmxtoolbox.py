@@ -416,7 +416,7 @@ class plotly_go():
                 data.append(trace)
         elif multi_files[0].endswith(".csv"):
             for i, trace in enumerate(traces_name_list):
-                x_data, y_data, _ = self.read_data(file, "PC1", renumber)
+                x_data, y_data, _ = self.read_data(multi_files[0], "PC1", renumber)
                 labels = [x for x in range(len(y_data[i]))]
                 trace = self.define_trace(x_data, y_data[i], file, 'rainbow', flag=flag, labels=labels)
                 data.append(trace)
