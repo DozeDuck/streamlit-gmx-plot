@@ -71,15 +71,24 @@ class plotly_go():
     def flag_recognizer(self,file1, plot_name):                                                   # first method to be called in __main__, used for creating object and charactors.
         flags_map = {
             'rms,': 'rmsd',
+            'rmsd' : 'rmsd',
             'rmsf,': 'rmsf',
+            'rmsf' : 'rmsf',
             'sasa,': 'sasa',
+            'sasa' : 'sasa',
             'gyrate,': 'gyrate',
+            'gyrate' : 'gyrate',
             'dipoles,': 'dipoles',
+            'dipoles' : 'dipoles',
             'distance,': 'distance',
+            'distance' : 'distance',
             'rdf,': 'rdf',
+            'rdf' : 'rdf',
             'convergence': 'convergence',
             'anaeig,': 'pca',
-            'angle,': 'angle'
+            'pca' : 'pca',
+            'angle,': 'angle',
+            'angle' : 'angle'
         }
                  
         if file1.endswith(".xvg"):
@@ -102,7 +111,7 @@ class plotly_go():
             base_name = os.path.basename(file1)
             filename = os.path.splitext(base_name)[0]
             self.flag = filename.lower()
-            if plot_name.lower() == 'pca':
+            if 'pca' in plot_name.lower() :
                 self.flag = 'pca'
             print("I know you are plotting " + self.flag + " figures!")
         st.text(self.flag)
