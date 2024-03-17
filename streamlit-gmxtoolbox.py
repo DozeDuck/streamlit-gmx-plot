@@ -238,6 +238,7 @@ class plotly_go():
                     colorbar=dict(title='Label Range'),  # 添加颜色条
                 ),
             )
+            st.text("we are plotting pca")
         elif violine != 'False':
             trace = go.Violin(x0=str(file_name).split('.')[0], y=y_data, line=dict(color='black'), fillcolor=colour, name=str(file_name).split('.')[0], box_visible=True, meanline_visible=True, opacity=0.6)            
         else:
@@ -407,7 +408,7 @@ class plotly_go():
         # 处理 PCA 数据
         for i, file in enumerate(multi_files):          
             x_data, y_data, _ = self.read_data(file, "PC1", renumber)  # 假设 "PC1" 和 "PC2" 是合适的轴名称
-            st.text(y_data)
+            # st.text(y_data)
             labels = [x for x in range(len(y_data))]
             
             # 使用 define_trace 创建迹线
