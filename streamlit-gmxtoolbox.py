@@ -406,17 +406,20 @@ class plotly_go():
         plot_title, x_name, y_name, traces_name_list = self.extract_plot_details(multi_files, plot_name, xaxis_name, yaxis_name, flag, histogram)
 
         # 处理 PCA 数据
-        for i, file in enumerate(multi_files):          
-            x_data, y_data, _ = self.read_data(file, "PC1", renumber)  # 假设 "PC1" 和 "PC2" 是合适的轴名称
-            st.text(x_data)
-            st.text(y_data)
-            labels = [x for x in range(len(y_data))]
-            st.text(labels)
-            
-            # 使用 define_trace 创建迹线
-            trace = self.define_trace(x_data, y_data, file, 'rainbow', flag=flag, labels=labels)  # 假设使用 'rainbow' 作为颜色
-            data.append(trace)
-
+        if multi_files[0].endswith(".xvg"):
+            for i, file in enumerate(multi_files):          
+                x_data, y_data, _ = self.read_data(file, "PC1", renumber)  # 假设 "PC1" 和 "PC2" 是合适的轴名称
+                labels = [x for x in range(len(y_data))]
+                
+                # 使用 define_trace 创建迹线
+                trace = self.define_trace(x_data, y_data, file, 'rainbow', flag=flag, labels=labels)  # 假设使用 'rainbow' 作为颜色
+                data.append(trace)
+        elif multi_files[0].endswith(".csv"):
+            for i, trace in enumerate(traces_name_list):
+                x_data, y_data, _ = self.read_data(multi_files[0], x_name, renumber)
+                labels = [x for x in range(len(y_data[i]))]
+                trace = self.define_trace(x_data, y_data[i], file, 'rainbow', flag=flag, labels=labels)
+                data.append(trace)
         # 使用 setup_layout 设置布局
         layout = self.setup_layout(plot_title, title_font, 'PC1 (nm)', 'PC2 (nm)', xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t ,b, flag=flag)
 
