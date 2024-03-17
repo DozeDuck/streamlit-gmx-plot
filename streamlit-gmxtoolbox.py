@@ -108,12 +108,12 @@ class plotly_go():
                 print("I know you are plotting " + self.flag + " figures!")
        
         elif file1.endswith(".csv"):
-            base_name = os.path.basename(file1)
-            filename = os.path.splitext(base_name)[0]
-            self.flag = filename.lower()
-            if 'pca' in plot_name.lower() :
-                self.flag = 'pca'
-            print("I know you are plotting " + self.flag + " figures!")
+            found = False
+            for key in flags_map:
+                if key.strip(',') in a:  # 使用strip去除可能的逗号后，检查键是否在字符串a中
+                    found = True
+                    self.flag = flags_map[key]  # 假设self.flag需要被设置为找到的第一个匹配项对应的字典值
+                    break  # 找到第一个匹配项后即退出循环
         st.text(self.flag)
         
 
