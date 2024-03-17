@@ -102,7 +102,7 @@ class plotly_go():
             base_name = os.path.basename(file1)
             filename = os.path.splitext(base_name)[0]
             self.flag = filename.lower()
-            if plot_name.lower == 'pca':
+            if plot_name.lower() == 'pca':
                 self.flag = 'pca'
             print("I know you are plotting " + self.flag + " figures!")
         st.text(self.flag)
