@@ -407,7 +407,7 @@ class plotly_go():
         # 处理 PCA 数据
         for i, file in enumerate(multi_files):          
             x_data, y_data, _ = self.read_data(file, "PC1", renumber)  # 假设 "PC1" 和 "PC2" 是合适的轴名称
-            st.text(x_data)
+            st.text(y_data)
             labels = [x for x in range(len(y_data))]
             
             # 使用 define_trace 创建迹线
