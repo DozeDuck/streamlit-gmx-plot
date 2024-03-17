@@ -105,7 +105,7 @@ class plotly_go():
             if plot_name.lower == 'pca':
                 self.flag = 'pca'
             print("I know you are plotting " + self.flag + " figures!")
-
+        st.text(self.flag)
         
 
 
