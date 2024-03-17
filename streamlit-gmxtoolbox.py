@@ -398,7 +398,7 @@ class plotly_go():
         color = ['rainbow']
         # labels = []
         # 使用 extract_plot_details 方法获取图表标题和轴标签
-        plot_title, x_name, y_name = self.extract_plot_details(multi_files, plot_name, xaxis_name, yaxis_name, flag, histogram)
+        plot_title, x_name, y_name, traces_name_list = self.extract_plot_details(multi_files, plot_name, xaxis_name, yaxis_name, flag, histogram)
 
         # 处理 PCA 数据
         for i, file in enumerate(multi_files):          
