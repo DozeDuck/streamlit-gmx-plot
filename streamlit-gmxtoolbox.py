@@ -54,7 +54,7 @@ class plotly_go():
     average_value = []
     multi_flag = ''
 
-    def __init__(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, l,r,t,b, violin):
+    def __init__(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, l,r,t,b, violin, smooth):
 
         if len(multi_files) >=1:
             # print(multi_files)
@@ -63,9 +63,9 @@ class plotly_go():
             if self.pca_flag != 1 and self.flag != 'pca':
                 self.plotly_multy(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin)
             elif self.pca_flag == 1:
-                self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b)
+                self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, smooth)
             elif self.flag == 'pca':
-                self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b)
+                self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, smooth)
 
 
     def flag_recognizer(self,file1, plot_name):                                                   # first method to be called in __main__, used for creating object and charactors.
@@ -233,9 +233,9 @@ class plotly_go():
     
         return plot_title, x_name, y_name, traces_name_list
 
-    def define_trace(self, x_data, y_data, file_name, colour, violine='False', flag=0, labels=0):
+    def define_trace(self, x_data, y_data, file_name, colour, violine='False', flag=0, labels=0, smooth=0):
         # 创建并返回迹线
-        if flag == 'pca':
+        if flag == 'pca' and smooth != 'true':
             trace = go.Scatter(
                 x=x_data,
                 y=y_data,
@@ -246,6 +246,8 @@ class plotly_go():
                     colorbar=dict(title='Label Range'),  # 添加颜色条
                 ),
             )
+        elif flag =='pca' and smooth == 'true':
+            trace = go.Heatmap(z=x_data, showscale=False, connectgaps=True, zsmooth='best')
         elif violine != 'False':
             trace = go.Violin(x0=str(file_name).split('.')[0], y=y_data, line=dict(color='black'), fillcolor=colour, name=str(file_name).split('.')[0], box_visible=True, meanline_visible=True, opacity=0.6)            
         else:
@@ -272,7 +274,23 @@ class plotly_go():
             width=xaxis_size, height=yaxis_size
         )
         return layout
+    def pca_bins_density_define(self, nbins, data):
+        # 确定边界
+        x_min, y_min = np.min(data, axis=0)
+        x_max, y_max = np.max(data, axis=0)
 
+        # 创建网格
+        n_bins = nbins
+        x_bins = np.linspace(x_min, x_max, n_bins + 1)
+        y_bins = np.linspace(y_min, y_max, n_bins + 1)
+
+        # 计算每个格子内的点的数量（密度）
+        density_matrix = np.zeros((n_bins, n_bins))
+        for x, y in data:
+            x_idx = np.digitize(x, x_bins) - 1
+            y_idx = np.digitize(y, y_bins) - 1
+            density_matrix[y_idx, x_idx] += 1  # 注意矩阵的索引和坐标系的方向
+        return density_matrix
     def streamlit_download_file_plotly(self, download_name, content_file):
         # 读取文件内容
         with open(content_file, "rb") as file:
@@ -405,7 +423,7 @@ class plotly_go():
 
          
             
-    def plotly_pca(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l, r, t ,b):
+    def plotly_pca(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l, r, t ,b, smooth):
         data = []
         color = ['rainbow']
         # labels = []
@@ -413,20 +431,38 @@ class plotly_go():
         plot_title, x_name, y_name, traces_name_list = self.extract_plot_details(multi_files, plot_name, xaxis_name, yaxis_name, flag, histogram)
 
         # 处理 PCA 数据
-        if multi_files[0].endswith(".xvg"):
-            for i, file in enumerate(multi_files):          
-                x_data, y_data, _ = self.read_data(file, "PC1", renumber)  # 假设 "PC1" 和 "PC2" 是合适的轴名称
-                labels = [x for x in range(len(y_data))]
-                
-                # 使用 define_trace 创建迹线
-                trace = self.define_trace(x_data, y_data, file, 'rainbow', flag=flag, labels=labels)  # 假设使用 'rainbow' 作为颜色
-                data.append(trace)
-        elif multi_files[0].endswith(".csv"):
-            for i, trace in enumerate(traces_name_list):
-                x_data, y_data, _ = self.read_data(multi_files[0], "PC1", renumber)
-                labels = [x for x in range(len(y_data[i]))]
-                trace = self.define_trace(x_data, y_data[i], multi_files[0], 'rainbow', flag=flag, labels=labels)
-                data.append(trace)
+        if smooth != 'true':
+            if multi_files[0].endswith(".xvg"):
+                for i, file in enumerate(multi_files):          
+                    x_data, y_data, _ = self.read_data(file, "PC1", renumber)  # 假设 "PC1" 和 "PC2" 是合适的轴名称
+                    labels = [x for x in range(len(y_data))]
+                    
+                    # 使用 define_trace 创建迹线
+                    trace = self.define_trace(x_data, y_data, file, 'rainbow', flag=flag, labels=labels)  # 假设使用 'rainbow' 作为颜色
+                    data.append(trace)
+            elif multi_files[0].endswith(".csv"):
+                for i, trace in enumerate(traces_name_list):
+                    x_data, y_data, _ = self.read_data(multi_files[0], "PC1", renumber)
+                    labels = [x for x in range(len(y_data[i]))]
+                    trace = self.define_trace(x_data, y_data[i], multi_files[0], 'rainbow', flag=flag, labels=labels)
+                    data.append(trace)
+        elif smooth == 'true':
+            if multi_files[0].endswith(".xvg"):
+                for i, file in enumerate(multi_files):          
+                    x_data, y_data, _ = self.read_data(file, "PC1", renumber)  # 假设 "PC1" 和 "PC2" 是合适的轴名称
+                    data = [list(pair) for pair in zip(x_data, y_data[i])]
+                    density_matrix = self.pca_bins_density_define(nbin, data)
+                    # 使用 define_trace 创建迹线
+                    trace = self.define_trace(density_matrix, density_matrix, file, 'rainbow', flag=flag, smooth=smooth)  # 假设使用 'rainbow' 作为颜色
+                    data.append(trace)
+            elif multi_files[0].endswith(".csv"):
+                for i, trace in enumerate(traces_name_list):
+                    x_data, y_data, _ = self.read_data(multi_files[0], "PC1", renumber)
+                    data = [list(pair) for pair in zip(x_data, y_data[i])]
+                    density_matrix = self.pca_bins_density_define(nbin, data)
+                    trace = self.define_trace(density_matrix, density_matrix, multi_files[0], 'rainbow', flag=flag, smooth=smooth)
+                    data.append(trace)
+            data = [list(pair) for pair in zip(x_data, y_data)]
         # 使用 setup_layout 设置布局
         layout = self.setup_layout(plot_title, title_font, 'PC1 (nm)', 'PC2 (nm)', xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t ,b, flag=flag)
 
@@ -1010,6 +1046,7 @@ with plot:
     rdf_cutoff = st.number_input("RDF cutoff value", min_value=0.0, step=0.1, value=0.0)
     average = st.selectbox("Calculate average", ['false', 'true'])
     plot_name = st.text_input("Plot title", value="auto detect")
+    smooth = st.selectbox("Whether PCA in a smooth style", ['false', 'true'])
     nbin = st.number_input("Number of bins (for PCA)", min_value=1, step=1, value=1)
     size = st.number_input("Size (for PCA)", min_value=1, step=1, value=500)
     move_average = st.number_input("Window size for moving average", min_value=0, step=1, value=0)
@@ -1035,7 +1072,7 @@ with plot:
     violin = st.selectbox("violin style", ['False', 'True'])
 
     if st.button('Plotting') and multi_files[0] != 0:
-        x = plotly_go(tmp_path, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, margin_l, margin_r, margin_t, margin_b, violin)
+        x = plotly_go(tmp_path, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, margin_l, margin_r, margin_t, margin_b, violin, smooth)
 
 # 在第二栏中添加内容
 with mradder:
