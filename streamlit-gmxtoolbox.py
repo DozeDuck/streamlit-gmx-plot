@@ -287,7 +287,8 @@ class plotly_go():
         # 处理直方图
         fig_hist = ff.create_distplot(histogram_data, group_labels, colors=colors, bin_size=nbin, curve_type='normal')
         fig_hist.update_layout(title_text=plot_title)
-        pio.write_image(fig_hist, "histogram_" + output_file_name)
+        pio.write_image(fig_hist, "/tmp/" + output_file_name)
+        self.streamlit_download_file_plotly("hist_" + output_file_name, "/tmp/" + output_file_name)
 
     def calculate_average(self, multi_files, xaxis_name, renumber):
         # 计算平均值
