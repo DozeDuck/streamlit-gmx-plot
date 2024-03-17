@@ -59,7 +59,7 @@ class plotly_go():
         if len(multi_files) >=1:
             # print(multi_files)
             file1 = multi_files[0]
-            self.flag_recognizer(file1)
+            self.flag_recognizer(file1, plot_name)
             if self.pca_flag != 1 and self.flag != 'pca':
                 self.plotly_multy(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin)
             elif self.pca_flag == 1:
@@ -102,7 +102,11 @@ class plotly_go():
             base_name = os.path.basename(file1)
             filename = os.path.splitext(base_name)[0]
             self.flag = filename.lower()
+            if plot_name.lower == 'pca':
+                self.flag = 'pca'
             print("I know you are plotting " + self.flag + " figures!")
+
+        
 
 
     def consist(self,x_values):
