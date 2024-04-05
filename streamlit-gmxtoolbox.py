@@ -437,8 +437,8 @@ class plotly_go():
         plot_title, x_name, y_name, traces_name_list = self.extract_plot_details(multi_files, plot_name, xaxis_name, yaxis_name, flag, histogram)
         if xaxis_name == 'auto detect':
             x_name = 'PC1 (nm)'
-        if xaxis_name == 'auto detect':
-            x_name = 'PC2 (nm)'
+        if yaxis_name == 'auto detect':
+            y_name = 'PC2 (nm)'
     # 处理 PCA 数据
         if smooth != 'true':
             if multi_files[0].endswith(".xvg"):
