@@ -3,3 +3,4 @@ plotly
 kaleido
 mdanalysis
 matplotlib
+rpy2
