@@ -1167,7 +1167,7 @@ with plot:
     rdf_cutoff = st.number_input("RDF cutoff value", min_value=0.0, step=0.1, value=0.0)
     average = st.selectbox("Calculate average", ['false', 'true'])
     plot_name = st.text_input("Plot title", value="auto detect")
-    smooth = st.selectbox("Whether plot in heatmap style", ['false', 'true'])
+    smooth = st.selectbox("Heatmap style", ['false', 'true'])
     nbin = st.number_input("Number of bins (for PCA set to 6)", min_value=1, step=1, value=6)
     size = st.number_input("Size (for PCA)", min_value=1, step=1, value=500)
     move_average = st.number_input("Window size for moving average", min_value=0, step=1, value=0)
