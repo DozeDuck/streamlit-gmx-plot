@@ -16,10 +16,13 @@ import plotly.graph_objs as go
 import plotly.io as pio
 # for PCA
 import numpy as np
-import rpy2.robjects as ro
-from rpy2.robjects import pandas2ri
-from rpy2.robjects.packages import importr
-from rpy2.robjects import conversion, default_converter
+# import rpy2.robjects as ro
+# from rpy2.robjects import pandas2ri
+# from rpy2.robjects.packages import importr
+# from rpy2.robjects import conversion, default_converter
+
+# for free energy
+import io
 
 # for histogram dist plot
 import plotly.figure_factory as ff
@@ -65,13 +68,14 @@ class plotly_go():
             # print(multi_files)
             file1 = multi_files[0]
             self.flag_recognizer(file1, plot_name)
-            if self.pca_flag != 1 and self.flag != 'pca':
-                self.plotly_multy(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin)
+            if self.pca_flag != 1 and self.flag != 'pca' and self.flag != 'free energy':
+                self.plotly_multy(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin, smooth)
             elif self.pca_flag == 1:
                 self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, smooth)
             elif self.flag == 'pca':
                 self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, smooth)
-
+            elif self.flag == 'free energy':
+                self.plotly_free_energy(multi_files, output_name, plot_name, nbin, size, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin, smooth)
 
     def flag_recognizer(self,file1, plot_name):                                                   # first method to be called in __main__, used for creating object and charactors.
         flags_map = {
@@ -93,7 +97,8 @@ class plotly_go():
             'anaeig,': 'pca',
             'pca' : 'pca',
             'angle,': 'angle',
-            'angle' : 'angle'
+            'angle' : 'angle',
+            'free': 'free energy'
         }
                  
         if file1.endswith(".xvg"):
@@ -120,6 +125,13 @@ class plotly_go():
                     self.flag = flags_map[key]  
                     break  
         
+        elif file1.endswith(".dat"):
+            with open(file1, 'r') as f:
+                lines = f.readlines()            
+                first_line = lines[0]
+                flag = 'free' if 'free' in first_line else None   
+                self.flag = flags_map.get(flag, flag)   
+            print("I know you are plotting " + self.flag + " figures!")
 
 
     def consist(self,x_values):
@@ -223,6 +235,34 @@ class plotly_go():
                    
         return x_data, y_data, sd_data  
     
+    def read_data_dat(self, file_name):
+        with open(file_name, 'r') as file:
+            lines = file.readlines()
+        # Identifying the line with column names
+        columns_line = [line for line in lines if line.startswith('#! FIELDS')][0]
+        # Extracting column names
+        column_names = columns_line.strip().split()[2:]  # Skip '#! FIELDS'
+        # 判断free_energy data 在第几列
+        index_of_free_energy = [index for index, name in enumerate(column_names) if 'free' in name][0]
+        # Extracting data lines (those not starting with '#')
+        data_lines = [line for line in lines if not line.startswith('#')]
+        # Converting data lines to a pandas DataFrame
+        df = pd.read_csv(io.StringIO('\n'.join(data_lines)), delim_whitespace=True, names=column_names)
+        
+        if index_of_free_energy == 2:
+            x_data = df[df.columns[0]].tolist()  # 第一列作为X轴数据
+            y_data = df[df.columns[1]].tolist()  # 第2列作为y轴数据
+            z_data = df[df.columns[2]].tolist()  # 第3列作为z轴数据
+        elif index_of_free_energy == 1:
+            x_data = df[df.columns[0]].tolist()  # 第一列作为X轴数据
+            y_data = df[df.columns[1]].tolist()  # 第2列作为y轴数据
+            z_data = []
+
+        # CSV文件不包含标准差数据，因此sd_data保持为空 
+                   
+        return x_data, y_data, z_data, df, index_of_free_energy, column_names
+    
+    
     def extract_plot_details(self, multi_files, plot_name, xaxis_name, yaxis_name, flag, histogram):
         traces_name_list = []
         ## Read XVG files
@@ -297,8 +337,10 @@ class plotly_go():
             )
         elif flag =='pca' and smooth == 'true':
             trace = go.Heatmap(z=x_data, colorscale='Viridis', showscale=True, connectgaps=True, zsmooth='best')
-        elif flag !='pca' and smooth == 'true':
+        elif flag =='angle' and smooth == 'true':
             trace = go.Heatmap(z=x_data, colorscale='Viridis', showscale=True, connectgaps=True, zsmooth='best', x=[-180, -120, -60, 60, 120,180], y=[-180, -120, -60, 60, 120,180])   
+        elif flag not in ['pca', 'angle'] and smooth == 'true':
+            trace = go.Heatmap(z=x_data, colorscale='Viridis', showscale=True, connectgaps=True, zsmooth='best')   
         elif violine != 'False':
             trace = go.Violin(x0=str(file_name).split('.')[0], y=y_data, line=dict(color='black'), fillcolor=colour, name=str(file_name).split('.')[0], box_visible=True, meanline_visible=True, opacity=0.6)            
         else:
@@ -466,7 +508,7 @@ class plotly_go():
         return np.convolve(y_data, np.ones(window_size) / window_size, mode='valid')
 
 
-    def plotly_multy(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin):
+    def plotly_multy(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth):
         Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
         data, histogram_data, group_labels = [], [], []
 
@@ -476,9 +518,14 @@ class plotly_go():
         if multi_files[0].endswith(".xvg"):
             for i, file in enumerate(multi_files):
                 x_data, y_data, _ = self.read_data_xvg(file, x_name, renumber)
-                trace = self.define_trace(x_data, y_data, uploaded_filenames[i], Plotly[i % len(Plotly)], violine=violin)
+                points = [list(pair) for pair in zip(x_data, y_data)]
+                density_matrix = self.pca_bins_density_define(nbin, points)
+                # 使用 define_trace 创建迹线
+                if smooth == 'true':
+                    trace = self.define_trace(density_matrix, density_matrix, file, 'rainbow', flag=flag, smooth=smooth)  # 假设使用 'rainbow' 作为颜色
+                else:
+                    trace = self.define_trace(x_data, y_data, uploaded_filenames[i], Plotly[i % len(Plotly)], violine=violin)
                 data.append(trace)
-    
                 # 添加直方图数据
                 if histogram == 'true':
                     histogram_data.append(y_data)
@@ -486,7 +533,13 @@ class plotly_go():
         elif multi_files[0].endswith(".csv"):
             for i, trace in enumerate(traces_name_list):
                 x_data, y_data, _ = self.read_data_csv(multi_files[0], x_name, renumber)
-                trace = self.define_trace(x_data, y_data[i], trace, Plotly[i % len(Plotly)], violine=violin)
+                points = [list(pair) for pair in zip(x_data, y_data)]
+                density_matrix = self.pca_bins_density_define(nbin, points)
+                # 使用 define_trace 创建迹线
+                if smooth == 'true':
+                    trace = self.define_trace(density_matrix, density_matrix, file, 'rainbow', flag=flag, smooth=smooth)  # 假设使用 'rainbow' 作为颜色
+                else:
+                    trace = self.define_trace(x_data, y_data, uploaded_filenames[i], Plotly[i % len(Plotly)], violine=violin)
                 data.append(trace)
     
                 # 添加直方图数据
@@ -528,16 +581,7 @@ class plotly_go():
             self.plot_graph(ma_data, layout, "MovingAverage_" + output_name)
 
 
-        # # 调用上述方法
-        # for i, file in enumerate(multi_files):
-        #     x_data, y_data, sd_data = self.read_data(file, xaxis_name, renumber)
-        #     trace = self.define_trace(x_data, y_data, file, Plotly[i % len(Plotly)])
-        #     data.append(trace)
-
-        # layout = self.setup_layout(plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show)
-        # self.plot_graph(data, layout, output_name)
-
-            
+    
     def plotly_pca(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l, r, t ,b, smooth):
         data = []
         color = ['rainbow']
@@ -589,6 +633,47 @@ class plotly_go():
         # self.plot_heatmap(x_data, y_data, plot_title, x_name, y_name, size, output_name)
         # 使用 plot_graph 绘制图形
         self.plot_graph(data, layout, "Scatter_" + output_name)
+
+    def plotly_free_energy(self, multi_files, output_name, plot_name, nbin, size, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth):
+        x_data, y_data, z_data, df, index_of_free_energy, column_names = self.read_data_dat(multi_files[0])
+        # 如果有3列，则为phi psi 自由能
+        if index_of_free_energy == 2:
+            phi_values = np.degrees(np.unique(x_data))
+            psi_values = np.degrees(np.unique(y_data))
+            phi_grid, psi_grid = np.meshgrid(phi_values, psi_values)
+            z_data_array = np.array(z_data)
+            free_energy_grid = z_data_array.reshape(len(psi_values), len(phi_values))
+            # Plot the FES
+            plt.contourf(phi_grid, psi_grid, free_energy_grid, levels=100)
+            if xaxis_name == 'auto detect' and yaxis_name == 'auto detect':
+                plt.xlabel(column_names[0])
+                plt.ylabel(column_names[1])
+            else:
+                plt.xlabel(xaxis_name)
+                plt.ylabel(yaxis_name)                
+            plt.colorbar(label='Free energy / kJ mol^-1')
+            plt.title('Free Energy Surface')
+            plt.savefig("/tmp/" + output_name)
+            self.streamlit_download_file_plotly(output_name, "/tmp/" + output_name)
+
+
+        elif index_of_free_energy == 1:
+            # Extract columns from data
+            distance = x_data
+            free_energy = y_data
+            # Plot FES
+            plt.plot(distance, free_energy, label='FES')
+            # Labeling the plot
+            if xaxis_name == 'auto detect' and yaxis_name == 'auto detect':
+                plt.xlabel(column_names[0])
+                plt.ylabel(column_names[1])
+            else:
+                plt.xlabel(xaxis_name)
+                plt.ylabel(yaxis_name) 
+            plt.title('Free Energy Surface')
+            plt.legend()
+            plt.savefig("/tmp/" + output_name)
+            self.streamlit_download_file_plotly(output_name, "/tmp/" + output_name)
 
 ##########################################################################################################################################################################################
 class mr(): # read content from the uploaded file directly.
@@ -1138,7 +1223,7 @@ class pep2lig():
 ##########################################################################################################################################################################################
 
 # Title
-st.title("Welcome to gmx tool box")
+st.title("Welcome to gmx tool box 1.0")
 
 # 创建4栏布局
 plot, mradder, gromerge, contact_map = st.columns(4)
@@ -1157,7 +1242,7 @@ def save_uploaded_file(uploaded_file):
 with plot:
     st.header("Plot figures")
     # Collecting user inputs
-    multi_files = st.file_uploader("Upload files", accept_multiple_files=True, type=['xvg', 'gro', 'itp', 'top', 'csv'])
+    multi_files = st.file_uploader("Upload files", accept_multiple_files=True, type=['xvg', 'gro', 'itp', 'top', 'csv', 'dat'])
     # 保存上传文件的文件名
     uploaded_filenames = [uploaded_file.name for uploaded_file in multi_files]
     # 保存上传的文件到临时位置
