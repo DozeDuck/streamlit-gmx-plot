@@ -1153,7 +1153,7 @@ def save_uploaded_file(uploaded_file):
 
 # 在第一栏中添加内容
 with plot:
-    st.header("plot figures")
+    st.header("Plot figures")
     # Collecting user inputs
     multi_files = st.file_uploader("Upload files", accept_multiple_files=True, type=['xvg', 'gro', 'itp', 'top', 'csv'])
     # 保存上传文件的文件名
