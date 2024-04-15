@@ -1517,8 +1517,11 @@ class renumber_MODEL():
                     new_line = re.sub(r"^\s*MODEL\s+\d+", f"MODEL        {count}", line)
                     count += 1
                     output.write(new_line)
+                    lines += 1
                 else:
                     output.write(line)
+                    lines += 1
+            st.text(lines)
             self.streamlit_download_file("renumbered.pdb", "/tmp/renumbered.pdb")
             
         
