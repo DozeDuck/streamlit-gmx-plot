@@ -1511,7 +1511,6 @@ class renumber_MODEL():
         with open(files, 'r') as file, open(f'/tmp/renumbered.pdb', 'w') as output:
             # 遍历文件中的每一行
             for line in file:
-                st.text(line)
                 # 使用正则表达式检查行是否包含"MODEL"和后面的数字
                 if re.match(r"^\s*MODEL\s+\d+", line):
                     # 替换匹配的行为"MODEL"后面接计数器的值，并将计数器加一
@@ -1520,7 +1519,7 @@ class renumber_MODEL():
                     output.write(new_line)
                 else:
                     output.write(line)
-            self.streamlit_download_file(f"renumbered.pdb", f'/tmp/renumbered.pdb')
+            self.streamlit_download_file("renumbered.pdb", "/tmp/renumbered.pdb")
             
         
     def streamlit_download_file(self, download_name, content_file):
