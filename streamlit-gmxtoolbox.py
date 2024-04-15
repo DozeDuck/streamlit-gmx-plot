@@ -1521,7 +1521,6 @@ class renumber_MODEL():
                 else:
                     output.write(line)
                     lines += 1
-            st.text(lines)
             self.streamlit_download_file("renumbered.pdb", "/tmp/renumbered.pdb")
             
         
@@ -1530,13 +1529,15 @@ class renumber_MODEL():
         # 打开 content_file 文件并读取其内容
         with open(content_file, 'r') as top_file:
             content = top_file.read()     
-            # 添加一个下载按钮，传递 receptor_top_content 作为文件内容
-            st.download_button(
-                label = "Download " +  download_name,
-                data = content,
-                key = download_name,
-                file_name = download_name
-                )
+            st.write(f"The number of lines in the file:{len(content)}")
+            
+        # 添加一个下载按钮，传递 receptor_top_content 作为文件内容
+        st.download_button(
+            label = "Download " +  download_name,
+            data = content,
+            key = download_name,
+            file_name = download_name
+            )
 ##########################################################################################################################################################################################
 
 # Title
