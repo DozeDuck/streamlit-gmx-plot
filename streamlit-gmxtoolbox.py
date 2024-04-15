@@ -1528,8 +1528,9 @@ class renumber_MODEL():
         # Download topol.top file  #      
         # 打开 content_file 文件并读取其内容
         with open(content_file, 'r') as top_file:
-            content = top_file.read()     
-            st.write(f"The number of lines in the file:{len(content)}")
+            content = top_file.read()   
+            lines = top_file.readlines()
+            st.write(f"The number of lines in the file:{len(lines)}")
             
         # 添加一个下载按钮，传递 receptor_top_content 作为文件内容
         st.download_button(
