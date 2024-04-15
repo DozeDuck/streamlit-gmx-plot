@@ -1527,6 +1527,7 @@ class renumber_MODEL():
         # 打开 content_file 文件并读取其内容
         with open(content_file, 'r') as top_file:
             content = top_file.read()
+            st.text(content[-1]
         
         # 添加一个下载按钮，传递 receptor_top_content 作为文件内容
         st.download_button(
