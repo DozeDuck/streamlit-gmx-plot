@@ -1524,6 +1524,7 @@ class renumber_MODEL():
                         
             st.write(f"before download, the file includes: {lines}")
             self.streamlit_download_file("renumbered.pdb", "/tmp/renumbered.pdb")
+            output.flush()
             
         
     def streamlit_download_file(self, download_name, content_file):
@@ -1544,6 +1545,7 @@ class renumber_MODEL():
             key = download_name,
             file_name = download_name
             )
+        output.flush()
 ##########################################################################################################################################################################################
 
 # Title
