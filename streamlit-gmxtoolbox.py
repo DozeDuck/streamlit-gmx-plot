@@ -1510,8 +1510,8 @@ class renumber_MODEL():
         # 打开输入文件和输出文件
         with open(files, 'r') as file, open(f'/tmp/renumbered.pdb', 'w') as output:
             # 遍历文件中的每一行
-            st.text(file)
             for line in file:
+                st.text(line)
                 # 使用正则表达式检查行是否包含"MODEL"和后面的数字
                 if re.match(r"^\s*MODEL\s+\d+", line):
                     # 替换匹配的行为"MODEL"后面接计数器的值，并将计数器加一
