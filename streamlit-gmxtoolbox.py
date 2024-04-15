@@ -1523,7 +1523,7 @@ class renumber_MODEL():
                     lines += 1
         with open('/tmp/renumbered.pdb', 'r') as file:
             lines = file.readlines()
-            st.write(f"before download, the file includes: {lines}")
+            st.write(f"before download, the file includes: {len(lines)}")
             
         self.streamlit_download_file("renumbered.pdb", "/tmp/renumbered.pdb")            
         
