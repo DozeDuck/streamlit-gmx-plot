@@ -1521,9 +1521,9 @@ class renumber_MODEL():
                 else:
                     output.write(line)
                     lines += 1
-        with open('/tmp/renumbered.pdb', 'r') as file:
-            lines = file.readlines()
-            st.write(f"before download, the file includes: {len(lines)}")
+        #with open('/tmp/renumbered.pdb', 'r') as file:
+        #    lines = file.readlines()
+        #    st.write(f"before download, the file includes: {len(lines)}")
             
         self.streamlit_download_file("renumbered.pdb", "/tmp/renumbered.pdb")            
         
@@ -1533,9 +1533,9 @@ class renumber_MODEL():
         with open(content_file, 'r') as top_file:
             content = top_file.read()   
 
-        with open(content_file, 'r') as file:
-            lines = file.readlines()
-            st.write(f"after download, the file includes: {len(lines)}")
+        #with open(content_file, 'r') as file:
+        #    lines = file.readlines()
+        #    st.write(f"after download, the file includes: {len(lines)}")
 
             
         # 添加一个下载按钮，传递 receptor_top_content 作为文件内容
