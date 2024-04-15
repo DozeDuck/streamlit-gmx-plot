@@ -1141,7 +1141,7 @@ class gromerger(): # read uploaded files
                 # add ligand molecule type to topol.top
                 for i, line in enumerate(topol_lines):
                     if 'molecules' in line:
-                        topol_lines.insert(-1, f"{B}                1\n")
+                        topol_lines.append(f"{B}                1\n")
                         break
                 
                 with open(receptor_top, 'w') as topol_file:
