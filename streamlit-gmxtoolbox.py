@@ -677,6 +677,7 @@ class plotly_go():
 
         # 处理平均值
         if average == 'true':
+            plot_title, x_name, y_name, traces_name_list = self.extract_plot_details(multi_files, plot_name, xaxis_name, yaxis_name, flag, histogram)
             average_data = self.calculate_average(multi_files, xaxis_name, renumber)
             average_trace = self.define_trace(x_data, average_data, "Average", 'black')
             # data.append(average_trace)
