@@ -700,6 +700,9 @@ class plotly_go():
             plot_title, x_name, y_name, traces_name_list = self.extract_plot_details(multi_files, plot_name, xaxis_name, yaxis_name, flag, histogram)
             df_average, df_sd, x_data = self.calculate_for_error_bar_or_band(multi_files, x_name, replica_number, uploaded_filenames)
             error_data = self.define_trace_for_error_bands(error_bar, df_average, df_sd, x_data, transparency)
+            # change Time (ps) to Time (ns)
+            if x_name == 'Time (ps)':
+                x_name = 'Time (ns)'
             error_layout = self.setup_layout(plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t , b, x_low, x_high, y_low, y_high, violine=violin, axis_shows=axis_show, line_width=linewidth)
             self.plot_graph(error_data, error_layout, "error_bar_" + output_name)
 
