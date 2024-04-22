@@ -1557,7 +1557,7 @@ class renumber_MODEL():
 ##########################################################################################################################################################################################
 
 # Title
-st.title("Welcome to gmx tool box 1.3")
+st.title("Welcome to gmx tool box 1.4")
 
 # 创建4栏布局
 plot, mradder, gromerge, contact_map = st.columns(4)
