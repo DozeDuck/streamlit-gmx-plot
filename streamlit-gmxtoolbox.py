@@ -766,7 +766,7 @@ class plotly_go():
             x_data, y_data, z_data, df, index_of_free_energy, column_names = self.read_data_dat(file)
             # 如果有3列，则为phi psi 自由能
             if index_of_free_energy == 2:
-                if 'phi' in column_name or 'psi' in column_name:
+                if 'phi' in column_names or 'psi' in column_names:
                     x_values = np.degrees(np.unique(x_data))
                     y_values = np.degrees(np.unique(y_data))
                 else:
