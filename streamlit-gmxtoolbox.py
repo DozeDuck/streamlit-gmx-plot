@@ -766,16 +766,18 @@ class plotly_go():
             x_data, y_data, z_data, df, index_of_free_energy, column_names = self.read_data_dat(file)
             # 如果有3列，则为phi psi 自由能
             if index_of_free_energy == 2:
-                phi_values = np.degrees(np.unique(x_data))
-                psi_values = np.degrees(np.unique(y_data))
-                phi_grid, psi_grid = np.meshgrid(phi_values, psi_values)
+                x_values = np.degrees(np.unique(x_data))
+                y_values = np.degrees(np.unique(y_data))
+                x_grid, y_grid = np.meshgrid(x_values, y_values)
                 z_data_array = np.array(z_data)
-                free_energy_grid = z_data_array.reshape(len(psi_values), len(phi_values))
+                free_energy_grid = z_data_array.reshape(len(y_values), len(x_values))
                 # Plot the FES
-                plt.contourf(phi_grid, psi_grid, free_energy_grid, levels=100)
+                plt.contourf(x_grid, y_grid, free_energy_grid, levels=100)
                 if xaxis_name == 'auto detect' and yaxis_name == 'auto detect':
-                    plt.xlabel(column_names[0])
-                    plt.ylabel(column_names[1])
+                    xaxis_name = column_names[0]
+                    yaxis_name = column_names[1]
+                    plt.xlabel(xaxis_name)
+                    plt.ylabel(yaxis_name)
                 else:
                     plt.xlabel(xaxis_name)
                     plt.ylabel(yaxis_name)                
@@ -783,6 +785,20 @@ class plotly_go():
                 plt.title('Free Energy Surface')
                 plt.savefig("/tmp/" + str(i) + "_" + output_name)
                 self.streamlit_download_file_plotly(str(i) + "_" + output_name, "/tmp/" + str(i) + "_" + output_name)
+                # 3D plot
+                fig=plt.figure(figsize=(24,14), dpi=600)
+                ax = plt.axes(projection='3d')
+                surf = ax.plot_surface(x_values, y_values, free_energy_grid, cmap = 'jet', rstride=1, cstride=1, alpha=None,\
+                                       linewidth=0, antialiased=True)
+                # Set axes label
+                ax.set_title('Free Energy Surface')
+                ax.set_xlabel(xaxis_name, labelpad=5)
+                ax.set_ylabel(yaxis_name, labelpad=5)
+                ax.set_zlabel('Free energy / kJ mol^-1', labelpad=5)
+                fig.colorbar(surf, shrink=0.7, aspect=15)
+                plt.savefig("/tmp/" + str(i) + "_3D_" + output_name)
+                self.streamlit_download_file_plotly(str(i) + "_3D_" + output_name, "/tmp/" + str(i) + "_3D_" + output_name)
+
 
             # 如果有2列，则为distance 自由能
             elif index_of_free_energy == 1:
