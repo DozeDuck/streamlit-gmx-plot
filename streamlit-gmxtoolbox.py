@@ -788,8 +788,7 @@ class plotly_go():
                 # 3D plot
                 fig=plt.figure(figsize=(24,14), dpi=600)
                 ax = plt.axes(projection='3d')
-                surf = ax.plot_surface(x_values, y_values, free_energy_grid, cmap = 'jet', rstride=1, cstride=1, alpha=None,\
-                                       linewidth=0, antialiased=True)
+                surf = ax.plot_surface(x_values, y_values, free_energy_grid, cmap = 'jet', rstride=1, cstride=1, alpha=None, linewidth=0, antialiased=True)
                 # Set axes label
                 ax.set_title('Free Energy Surface')
                 ax.set_xlabel(xaxis_name, labelpad=5)
