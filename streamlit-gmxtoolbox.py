@@ -2296,7 +2296,7 @@ with mradder:
     ###
     isamino_acid = st.selectbox("Whethe treat it as an amino acids?", ['false', 'true'])
     ###
-    ar_atom_types_input = st.text_area("Atom Types ordered as the atoms in mol2 file)), Example: N CT C O CT S CT CT N3 C O CT CT NX NX O O O O H1 H1 H1 H1 H1 H1 H1 H1 H1 H")
+    ar_atom_types_input = st.text_area("Atom Types ordered as the atoms in mol2 file, Example: N CT C O CT S CT CT N3 C O CT CT NX NX O O O O H1 H1 H1 H1 H1 H1 H1 H1 H1 H")
     atom_types = ar_atom_types_input.split()
     ###
     ar_output_name = st.text_input("Output file name", 'ff_parameter.txt')
