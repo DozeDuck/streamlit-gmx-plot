@@ -1612,8 +1612,10 @@ class ff_res_adder():
             ff_aomtypes_dict    =   self.parse_atomtypes(ff_aomtypes, ff_nonbonded) 
         # self.print_nested_dict(ff_aomtypes_dict)  
         # Compare ff_atomtype and user provided atom_types
-        if ff_aomtypes_dict:
+        try:
             missing_atom_type   =   self.find_missing_atomtypes(ff_aomtypes_dict, atom_types, output_name)
+        except:
+            pass
         # bond_values_dict    =   self.calculate_bond_values(positions, itp_content_dicts)
         self.streamlit_download_file(output_name, "/tmp/" + output_name)
     # def parse_itp(self, lig_itp, atom_types):
