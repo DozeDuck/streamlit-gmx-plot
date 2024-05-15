@@ -1607,13 +1607,15 @@ class ff_res_adder():
         # self.print_nested_dict(bond_records_dict) 
         # self.print_nested_dict(ff_bonded_dict) 
         # Get the list of atom types
-        # ff_nonbonded_dict   =   self.parse_nonbonded(ff_nonbonded)          
-        ff_aomtypes_dict    =   self.parse_atomtypes(ff_aomtypes, ff_nonbonded) 
+        # ff_nonbonded_dict   =   self.parse_nonbonded(ff_nonbonded)  
+        if ff_aomtypes != 0 and ff_nonbonded != 0:
+            ff_aomtypes_dict    =   self.parse_atomtypes(ff_aomtypes, ff_nonbonded) 
         # self.print_nested_dict(ff_aomtypes_dict)  
         # Compare ff_atomtype and user provided atom_types
-        missing_atom_type   =   self.find_missing_atomtypes(ff_aomtypes_dict, atom_types, output_name)
+        if ff_aomtypes_dict:
+            missing_atom_type   =   self.find_missing_atomtypes(ff_aomtypes_dict, atom_types, output_name)
         # bond_values_dict    =   self.calculate_bond_values(positions, itp_content_dicts)
-
+        self.streamlit_download_file(output_name, "/tmp/" + output_name)
     # def parse_itp(self, lig_itp, atom_types):
     def parse_itp(self, lig_itp, atom_types):
         header_atomtypes = ['name', 'bond_type', 'mass', 'charge', 'ptype', 'sigma', 'epsilon', 'Amb_sigma', 'Amb_epsilon']      
@@ -2109,7 +2111,7 @@ class ff_res_adder():
         if missing_atom_types:
             with open("/tmp/" + output_name, "a") as file:
                 file.write(f"The missed atom types are: {missing_atom_type}\n")
-        self.streamlit_download_file(output_name, "/tmp/" + output_name)
+        
         return missing_atom_type
         
     def streamlit_download_file(self, download_name, content_file):
@@ -2243,33 +2245,13 @@ with mradder:
     tmp_ff_rtp_path = 0
     tmp_ff_hdb_path = 0
     tmp_ff_restype_path = 0
+    tmp_ff_nonbonded_path = 0
+    tmp_ff_aomtypes_path = 0
     ###
     ar_lig_itp = st.file_uploader("Upload lig_GMX.itp", accept_multiple_files=True, type=['itp'])
     uploaded_lig_itp_name = [uploaded_file.name for uploaded_file in ar_lig_itp]
     try:
         tmp_lig_itp_path = save_uploaded_file(ar_lig_itp[0])
-    except:
-        pass
-
-    ###
-    ar_lig_gro = st.file_uploader("Upload lig_GMX.gro", accept_multiple_files=True, type=['gro'])
-    uploaded_lig_gro_name = [uploaded_file.name for uploaded_file in ar_lig_gro]
-    try:
-        tmp_lig_gro_path = save_uploaded_file(ar_lig_gro[0])
-    except:
-        pass
-    ###
-    ar_ff_rtp = st.file_uploader("Upload aminoacids.rtp", accept_multiple_files=True, type=['rtp'])
-    uploaded_ff_rtp_name = [uploaded_file.name for uploaded_file in ar_ff_rtp]
-    try:
-        tmp_ff_rtp_path = save_uploaded_file(ar_ff_rtp[0])
-    except:
-        pass
-    ###
-    ar_ff_hdb = st.file_uploader("Upload aminoacids.hdb", accept_multiple_files=True, type=['hdb'])
-    uploaded_ff_hdb_name = [uploaded_file.name for uploaded_file in ar_ff_hdb]
-    try:
-        tmp_ff_hdb_path = save_uploaded_file(ar_ff_hdb[0])
     except:
         pass
     ###
@@ -2293,6 +2275,28 @@ with mradder:
         tmp_ff_aomtypes_path = save_uploaded_file(ar_ff_aomtypes[0])
     except:
         pass
+    ###
+    ar_lig_gro = st.file_uploader("Upload lig_GMX.gro", accept_multiple_files=True, type=['gro'])
+    uploaded_lig_gro_name = [uploaded_file.name for uploaded_file in ar_lig_gro]
+    try:
+        tmp_lig_gro_path = save_uploaded_file(ar_lig_gro[0])
+    except:
+        pass
+    ###
+    ar_ff_rtp = st.file_uploader("Upload aminoacids.rtp", accept_multiple_files=True, type=['rtp'])
+    uploaded_ff_rtp_name = [uploaded_file.name for uploaded_file in ar_ff_rtp]
+    try:
+        tmp_ff_rtp_path = save_uploaded_file(ar_ff_rtp[0])
+    except:
+        pass
+    ###
+    ar_ff_hdb = st.file_uploader("Upload aminoacids.hdb", accept_multiple_files=True, type=['hdb'])
+    uploaded_ff_hdb_name = [uploaded_file.name for uploaded_file in ar_ff_hdb]
+    try:
+        tmp_ff_hdb_path = save_uploaded_file(ar_ff_hdb[0])
+    except:
+        pass
+
     ###
     ar_ff_restype = st.file_uploader("Upload residuetypes.dat", accept_multiple_files=True, type=['dat'])
     uploaded_ff_restype_name = [uploaded_file.name for uploaded_file in ar_ff_restype]
