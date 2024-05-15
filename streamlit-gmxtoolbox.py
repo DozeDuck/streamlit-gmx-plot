@@ -2112,7 +2112,7 @@ class ff_res_adder():
         missing_atom_type = list(set(missing_atom_types))
         if missing_atom_types:
             with open("/tmp/" + output_name, "a") as file:
-                file.write("######################## Please add below to atomtypes.atp and ffnonbonded.itp separately! ########################\n")
+                file.write("######################## Please follow the steps below to edit atomtypes.atp and ffnonbonded.itp separately! ########################\n")
                 file.write(f"There are missed atom types: {missing_atom_type}\n")
                 file.write(f"Add the new atom type: {missing_atom_type} parameters to atomtypes.atp and ffnonbonded.itp\n")
         
