@@ -2244,6 +2244,9 @@ with mradder:
 
     ### 2nd subcolum in column 2, for adding new residues to gromacs forcefield ###
     mradder.subheader("Generate forcefield parameters for new residues")
+    st.text("Ps: you can upload files in below combination:")
+    st.text("1. lig_GMX.itp + ffbonded.itp")
+    st.text("2. lig_GMX.itp + ffbonded.itp + ffnonbonded.itp + atomtypes.atp")
     # Collecting user inputs
     tmp_lig_gro_path = 0
     tmp_ff_rtp_path = 0
