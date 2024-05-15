@@ -1587,7 +1587,10 @@ class ff_res_adder():
         # parse the lig_GMX.itp file
         itp_content_dicts   =   self.parse_itp(lig_itp, atom_types)
         # parse the lig_GMX.gro file
-        residue_numbers, residue_names, atom_names, atom_numbers, positions = self.parse_gro(lig_gro)
+        if lig_gro != 0:
+            residue_numbers, residue_names, atom_names, atom_numbers, positions = self.parse_gro(lig_gro)
+        else:
+            pass
         # replace the digit number to atom_types for bonds, angles, dihedrals, impropers
         bond_records_dict   =   self.generate_bond_records(itp_content_dicts)
         # the notes for residuetypes.dat
@@ -2236,6 +2239,10 @@ with mradder:
     ### 2nd subcolum in column 2, for adding new residues to gromacs forcefield ###
     mradder.subheader("Generate forcefield parameters for new residues")
     # Collecting user inputs
+    tmp_lig_gro_path = 0
+    tmp_ff_rtp_path = 0
+    tmp_ff_hdb_path = 0
+    tmp_ff_restype_path = 0
     ###
     ar_lig_itp = st.file_uploader("Upload lig_GMX.itp", accept_multiple_files=True, type=['itp'])
     uploaded_lig_itp_name = [uploaded_file.name for uploaded_file in ar_lig_itp]
