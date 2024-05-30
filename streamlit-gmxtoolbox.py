@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Version 1.5: Add x_scale and y_scale for plotly;continus error band added, DSSP, Renumber MODELS in PDB
+Version 1.6: Add x_scale and y_scale for plotly;continus error band added, DSSP, Renumber MODELS in PDB; modified the restraints adder function
 Created on Tue 16:15:48 2024-05-14
 
 @author: dozeduck
@@ -2176,7 +2176,7 @@ class ff_res_adder():
             )    
 ##########################################################################################################################################################################################
 # Title
-st.title("Welcome to gmx tool box 1.5")
+st.title("Welcome to gmx tool box 1.6")
 
 # 创建4栏布局
 plot, mradder, gromerge, contact_map = st.columns(4)
