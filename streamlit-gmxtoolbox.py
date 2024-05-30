@@ -864,7 +864,7 @@ class mr(): # read content from the uploaded file directly.
         self.pair_cal( self.metal1, self.atom1, self.metal2, self.atom2, self.metal3, self.atom3, self.metal4, self.atom4, self.metal5, self.atom5, self.metal6, self.atom6)
         self.angle_cal( self.metal1, self.atom1, self.metal2, self.atom2, self.metal3, self.atom3, self.metal4, self.atom4, self.metal5, self.atom5, self.metal6, self.atom6, angle_strength)
 
-    def GROreader(self,gro): 
+    def GROreader_not_good(self,gro): 
         lines = gro.splitlines()  # for streamlit 如果 'gro' 是一个二进制文件，使用 gro.decode().splitlines() 
 
             
@@ -889,7 +889,46 @@ class mr(): # read content from the uploaded file directly.
             self.y.append(float(line.split()[4]))               # The sixth column is the residue number
             self.z.append(float(line.split()[5]))                   # Column 7 is the x-coordinate of the atom
             self.xyz.append([float(line.split()[3]),float(line.split()[4]),float(line.split()[5])])
+    def GROreader(self, gro): 
+        with open(gro, 'r') as file:
+            lines = file.readlines()
     
+        self.head = lines[0].strip()
+        self.total_atom = int(lines[1])
+        self.last = lines[-1].strip()
+        
+        # 忽略前两行和最后一行
+        lines = lines[2:-1]
+        
+        # 初始化属性列表
+        self.resid = []
+        self.resname = []
+        self.atomname = []
+        self.index = []
+        self.x = []
+        self.y = []
+        self.z = []
+        self.xyz = []
+        
+        # 逐行解析内容
+        for line in lines:
+            resid = int(line[0:5].strip())
+            resname = line[5:10].strip()
+            atomname = line[10:15].strip()
+            atomindex = int(line[15:20].strip())
+            x = float(line[20:28].strip())
+            y = float(line[28:36].strip())
+            z = float(line[36:44].strip())
+            
+            self.resid.append(resid)
+            self.resname.append(resname)
+            self.atomname.append(atomname)
+            self.index.append(atomindex)
+            self.x.append(x)
+            self.y.append(y)
+            self.z.append(z)
+            self.xyz.append([x, y, z])
+
     def MetalMiner(self, metal_list):
         print(metal_list)
         for i in range(len(self.atomname)):
