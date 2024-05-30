@@ -890,8 +890,7 @@ class mr(): # read content from the uploaded file directly.
             self.z.append(float(line.split()[5]))                   # Column 7 is the x-coordinate of the atom
             self.xyz.append([float(line.split()[3]),float(line.split()[4]),float(line.split()[5])])
     def GROreader(self, gro): 
-        with open(gro, 'r') as file:
-            lines = file.readlines()
+        lines = gro.splitlines()  # for streamlit 如果 'gro' 是一个二进制文件，使用 gro.decode().splitlines() 
     
         self.head = lines[0].strip()
         self.total_atom = int(lines[1])
