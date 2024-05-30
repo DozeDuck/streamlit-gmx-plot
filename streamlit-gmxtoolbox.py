@@ -942,7 +942,7 @@ class mr(): # read content from the uploaded file directly.
 
         metals_name = [self.atomname[i-1] for i in self.metals]
         sentence = "The metals atom index are: {}".format(list(zip(metals_name, self.metals)))
-        print(sentence)
+        st.text(sentence)
         # print(self.metal1,self.metal2,self.metal3)
             
         
