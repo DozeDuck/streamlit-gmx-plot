@@ -1512,16 +1512,7 @@ class gmx_dssp():
             ss_percentage[ss_char] = (df == ss_type).sum(axis=1) / df.shape[1] * 100
         return ss_percentage
 
-    
-    def plot_figure(self, data, traj, outputname, original, unique_color, original_map, original_colorbar, original_colorscale, simple_map, simple_colorbar, simple_colorscale):
-        df = self.read_data(data, traj, original,unique_color)   
-        # 使用字典转换DataFrame中的值
-        if original == 'false':
-            structure_values = simple_map
-        else:
-            structure_values = original_map
-        df.replace(structure_values, inplace=True)
-
+    def plot_ss_percentage(self, df, structure_values, original, original_colorbar, simple_colorbar, outputname):
         # 计算二级结构百分比
         ss_percentage = self.calculate_ss_percentage(df, structure_values)
 
@@ -1552,8 +1543,19 @@ class gmx_dssp():
 
         # 显示百分比图
         pio.write_image(fig_ss_percentage, "/tmp/percentage-" + outputname)
-        self.streamlit_download_file_plotly("percentage-" + outputname, "/tmp/percentage-" + outputname)
+        self.streamlit_download_file_plotly("percentage-" + outputname, "/tmp/percentage-" + outputname)        
+    
+    def plot_figure(self, data, traj, outputname, original, unique_color, original_map, original_colorbar, original_colorscale, simple_map, simple_colorbar, simple_colorscale):
+        df = self.read_data(data, traj, original,unique_color)   
+        # 使用字典转换DataFrame中的值
+        if original == 'false':
+            structure_values = simple_map
+        else:
+            structure_values = original_map
+        df.replace(structure_values, inplace=True)
 
+        # 绘制percentage 图
+        self.plot_ss_percentage(df, structure_values, original, original_colorbar, simple_colorbar, outputname)
         
         # Define color scale and color bar settings
         simple_colorscale = simple_colorscale
