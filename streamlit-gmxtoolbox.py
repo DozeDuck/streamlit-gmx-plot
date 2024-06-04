@@ -1522,15 +1522,19 @@ class gmx_dssp():
         else:
             legend_mapping = {v: k for k, v in simple_colorbar.items()}
 
+        # Plotly颜色列表
+        plotly_colors = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
+
         # 绘制百分比图
         fig_ss_percentage = go.Figure()
-        for ss_type in ss_percentage.columns:
+        for idx, ss_type in enumerate(ss_percentage.columns):
             ss_type_name = legend_mapping[structure_values[ss_type]]
             fig_ss_percentage.add_trace(go.Scatter(
                 x=ss_percentage.index,
                 y=ss_percentage[ss_type],
                 mode='lines',
-                name=ss_type_name
+                name=ss_type_name,
+                line=dict(color=plotly_colors[idx % len(plotly_colors)])
             ))
 
         fig_ss_percentage.update_layout(
