@@ -1504,7 +1504,12 @@ class gmx_dssp():
             }
         return structure_values
         
-    def calculate_ss_percentage(self, df, structure_values):
+    def calculate_ss_percentage(self, df, structure_values, unique_color):
+        if unique_color == "true":
+            # 删除最后一行
+            df = df.drop(df.index[-1])
+        else:
+            pass
         inverse_structure_values = {v: k for k, v in structure_values.items()}
         ss_percentage = pd.DataFrame(index=df.index)
         for ss_type in set(structure_values.values()):
@@ -1512,7 +1517,7 @@ class gmx_dssp():
             ss_percentage[ss_char] = (df == ss_type).sum(axis=1) / df.shape[1] * 100
         return ss_percentage
 
-    def plot_ss_percentage(self, df, structure_values, original, original_colorbar, simple_colorbar, outputname):
+    def plot_ss_percentage(self, df, structure_values, original, original_colorbar, simple_colorbar, outputname, unique_color):
         # 计算二级结构百分比
         ss_percentage = self.calculate_ss_percentage(df, structure_values)
 
@@ -1559,7 +1564,7 @@ class gmx_dssp():
         df.replace(structure_values, inplace=True)
 
         # 绘制percentage 图
-        self.plot_ss_percentage(df, structure_values, original, original_colorbar, simple_colorbar, outputname)
+        self.plot_ss_percentage(df, structure_values, original, original_colorbar, simple_colorbar, outputname, unique_color)
         
         # Define color scale and color bar settings
         simple_colorscale = simple_colorscale
