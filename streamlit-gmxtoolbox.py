@@ -1519,7 +1519,7 @@ class gmx_dssp():
 
     def plot_ss_percentage(self, df, structure_values, original, original_colorbar, simple_colorbar, outputname, unique_color):
         # 计算二级结构百分比
-        ss_percentage = self.calculate_ss_percentage(df, structure_values)
+        ss_percentage = self.calculate_ss_percentage(df, structure_values, unique_color)
 
         # 定义映射字典
         if original != 'false':
