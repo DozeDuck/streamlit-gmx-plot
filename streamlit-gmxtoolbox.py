@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Version 1.6: Add x_scale and y_scale for plotly;continus error band added, DSSP, Renumber MODELS in PDB; modified the restraints adder function
+Version 1.7: Add x_scale and y_scale for plotly;continus error band added, DSSP(+percentage plot), Renumber MODELS in PDB; modified the restraints adder function
 Created on Tue 16:15:48 2024-05-14
 
 @author: dozeduck
@@ -1503,7 +1503,16 @@ class gmx_dssp():
                 '~': 1    # 'loop'  # No special secondary structure designation
             }
         return structure_values
+        
+    def calculate_ss_percentage(self, df, structure_values):
+        inverse_structure_values = {v: k for k, v in structure_values.items()}
+        ss_percentage = pd.DataFrame(index=df.index)
+        for ss_type in set(structure_values.values()):
+            ss_char = inverse_structure_values[ss_type]
+            ss_percentage[ss_char] = (df == ss_type).sum(axis=1) / df.shape[1] * 100
+        return ss_percentage
 
+    
     def plot_figure(self, data, traj, outputname, original, unique_color, original_map, original_colorbar, original_colorscale, simple_map, simple_colorbar, simple_colorscale):
         df = self.read_data(data, traj, original,unique_color)   
         # 使用字典转换DataFrame中的值
@@ -1513,6 +1522,39 @@ class gmx_dssp():
             structure_values = original_map
         df.replace(structure_values, inplace=True)
 
+        # 计算二级结构百分比
+        ss_percentage = self.calculate_ss_percentage(df, structure_values)
+
+        # 定义映射字典
+        if original != 'false':
+            legend_mapping = {v: k for k, v in original_colorbar.items()}
+        else:
+            legend_mapping = {v: k for k, v in simple_colorbar.items()}
+
+        # 绘制百分比图
+        fig_ss_percentage = go.Figure()
+        for ss_type in ss_percentage.columns:
+            ss_type_name = legend_mapping[structure_values[ss_type]]
+            fig_ss_percentage.add_trace(go.Scatter(
+                x=ss_percentage.index,
+                y=ss_percentage[ss_type],
+                mode='lines',
+                name=ss_type_name
+            ))
+
+        fig_ss_percentage.update_layout(
+            title='DSSP Percentage',
+            xaxis_title='Time (ns)',
+            yaxis_title='Percentage (%)',
+            width=800,
+            height=600
+        )
+
+        # 显示百分比图
+        pio.write_image(fig_ss_percentage, "/tmp/percentage-" + outputname)
+        self.streamlit_download_file_plotly("percentage-"outputname, "/tmp/percentage-" + outputname)
+
+        
         # Define color scale and color bar settings
         simple_colorscale = simple_colorscale
         original_colorscale = original_colorscale
