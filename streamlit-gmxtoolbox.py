@@ -1552,7 +1552,7 @@ class gmx_dssp():
 
         # 显示百分比图
         pio.write_image(fig_ss_percentage, "/tmp/percentage-" + outputname)
-        self.streamlit_download_file_plotly("percentage-"outputname, "/tmp/percentage-" + outputname)
+        self.streamlit_download_file_plotly("percentage-" + outputname, "/tmp/percentage-" + outputname)
 
         
         # Define color scale and color bar settings
