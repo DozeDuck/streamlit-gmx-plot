@@ -2278,7 +2278,7 @@ with plot:
     axis_show = st.selectbox("Show axis", ['True', 'False'])
     axis_show = ast.literal_eval(axis_show)
     line_width = st.number_input("Width of axis", min_value=1, step=1, value=2)
-    margin_l  = st.number_input("left margin", min_value=0, step=10, value=100)
+    margin_l  = st.number_input("left margin", min_value=0, step=10, value=120)
     margin_r  = st.number_input("right margin", min_value=0, step=10, value=60)
     margin_t  = st.number_input("top margin", min_value=0, step=10, value=60)
     margin_b  = st.number_input("bottom margin", min_value=0, step=10, value=100)
