@@ -1415,23 +1415,23 @@ class gmx_dssp():
         u = mda.Universe(traj)
         
         # 提取时间戳和残基列表 # 2024-07-05
-        # times = [ts.time for ts in u.trajectory]  # 假设时间单位是ns  # 2024-07-05
-        # residues = [res.resname + str(res.resid) for res in u.residues] # 2024-07-05
-        # return times, residues # 2024-07-05
+        times = [ts.time for ts in u.trajectory]  # 假设时间单位是ns  # 2024-07-05
+        residues = [res.resname + str(res.resid) for res in u.residues] # 2024-07-05
+        return times, residues # 2024-07-05
 
         # 提取残基列表并自动添加链ID
-        residues = []
-        previous_resid = None
-        chain_id = 'A'
+        # residues = []
+        # previous_resid = None
+        # chain_id = 'A'
         
-        for res in u.residues:
-            if previous_resid is not None and res.resid < previous_resid:
-                # Residue ID decreased, indicating a new chain
-                chain_id = chr(ord(chain_id) + 1)
-            residues.append(res.resname + str(res.resid) + "_" + chain_id)
-            previous_resid = res.resid
+        # for res in u.residues:
+          #   if previous_resid is not None and res.resid < previous_resid:
+            #     # Residue ID decreased, indicating a new chain
+              #   chain_id = chr(ord(chain_id) + 1)
+            # residues.append(res.resname + str(res.resid) + "_" + chain_id)
+            # previous_resid = res.resid
         
-        return times, residues
+        # return times, residues
     
     def detect_break(self, first_line, residue_list):
         # Find the positions of '=' in the first line
