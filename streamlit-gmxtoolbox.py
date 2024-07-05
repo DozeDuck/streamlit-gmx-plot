@@ -2249,7 +2249,7 @@ class ff_res_adder():
             )    
 ##########################################################################################################################################################################################
 # Title
-st.title("Welcome to gmx tool box 1.6")
+st.title("Welcome to gmx tool box 1.7")
 
 # 创建4栏布局
 plot, mradder, gromerge, contact_map = st.columns(4)
