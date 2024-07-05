@@ -1410,28 +1410,34 @@ class gmx_dssp():
     def __init__(self, ds_data, ds_traj, ds_output_name, ds_original, ds_color, original_map, original_colorbar, original_colorscale, simple_map, simple_colorbar, simple_colorscale):
         self.plot_figure(ds_data, ds_traj, ds_output_name, ds_original, ds_color, original_map, original_colorbar, original_colorscale, simple_map, simple_colorbar, simple_colorscale)
     
+    # def read_time_and_residue(self, traj):
+        # 载入PDB文件
+      #  u = mda.Universe(traj)
+        
+        # 提取时间戳和残基列表 # 2024-07-05
+      #  times = [ts.time for ts in u.trajectory]  # 假设时间单位是ns  # 2024-07-05
+      #  residues = [res.resname + str(res.resid) for res in u.residues] # 2024-07-05
+      #  return times, residues # 2024-07-05
     def read_time_and_residue(self, traj):
         # 载入PDB文件
         u = mda.Universe(traj)
         
-        # 提取时间戳和残基列表 # 2024-07-05
-        times = [ts.time for ts in u.trajectory]  # 假设时间单位是ns  # 2024-07-05
-        residues = [res.resname + str(res.resid) for res in u.residues] # 2024-07-05
-        return times, residues # 2024-07-05
-
+        # 提取时间戳
+        times = [ts.time for ts in u.trajectory]  # 假设时间单位是ns 
+        
         # 提取残基列表并自动添加链ID
-        # residues = []
-        # previous_resid = None
-        # chain_id = 'A'
+        residues = []
+        previous_resid = None
+        chain_id = 'A'
         
-        # for res in u.residues:
-          #   if previous_resid is not None and res.resid < previous_resid:
-            #     # Residue ID decreased, indicating a new chain
-              #   chain_id = chr(ord(chain_id) + 1)
-            # residues.append(res.resname + str(res.resid) + "_" + chain_id)
-            # previous_resid = res.resid
+        for res in u.residues:
+            if previous_resid is not None and res.resid < previous_resid:
+                # Residue ID decreased, indicating a new chain
+                chain_id = chr(ord(chain_id) + 1)
+            residues.append(res.resname + str(res.resid) + "_" + chain_id)
+            previous_resid = res.resid
         
-        # return times, residues
+        return times, residues
     
     def detect_break(self, first_line, residue_list):
         # Find the positions of '=' in the first line
