@@ -1907,7 +1907,8 @@ class ff_res_adder():
         # Print output as per the format discussed
         with open("/tmp/" + output_name, "a") as file:
             file.write("######################## Please add below to aminoacids.hdb! ########################\n")
-            file.write("CR1\t" + str(len(output)) + "\n")
+            # file.write("CR1\t" + str(len(output)) + "\n")
+            file.write(f"{itp_content_dict['atoms']['resname'][0]}\t" + str(len(output)) + "\n")
             for line in output:
                 file.write(line)
                 file.write("\n")
