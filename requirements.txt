@@ -4,3 +4,4 @@ kaleido
 mdanalysis
 matplotlib
 rpy2
+biopython
