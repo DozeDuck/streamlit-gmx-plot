@@ -2340,7 +2340,7 @@ class RMSD_per_Residue():
 
 
 # Title
-st.title("Welcome to gmx tool box 1.7")
+st.title("Welcome to gmx tool box 1.8")
 
 # 创建4栏布局
 plot, mradder, gromerge, contact_map = st.columns(4)
