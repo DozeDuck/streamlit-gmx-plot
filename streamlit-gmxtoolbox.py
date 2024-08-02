@@ -2249,6 +2249,96 @@ class ff_res_adder():
             file_name = download_name
             )    
 ##########################################################################################################################################################################################
+class RMSD_per_Residue():
+    def __init__(self, pdb_file, output_name, name_list=None):
+        self.pdb_file = pdb_file
+        self.name_list = name_list if name_list is not None else []
+        self.pdb_parser = PDBParser(QUIET=True)
+        st.text(self.pdb_file)
+        self.structure = self.pdb_parser.get_structure("Models", self.pdb_file)
+        self.models = list(self.structure.get_models())
+
+    def get_ca_coordinates_and_residues(self, model):
+        coords, residues_info, residues_id = [], [], []
+        for chain in model.get_chains():
+            for residue in chain.get_residues():
+                if "CA" in residue:
+                    ca_atom = residue["CA"]
+                    coords.append(ca_atom.get_coord())
+                    residues_info.append(residue.resname + str(residue.id[1]))
+                    residues_id.append(residue.id[1])
+        return np.array(coords), residues_info, residues_id
+
+    def calculate_distances(self):
+        first_model = self.models[0]
+        first_model_coords, first_model_residues, first_model_ids = self.get_ca_coordinates_and_residues(first_model)
+        distances_per_model = []
+
+        for model in self.models[1:]:  # Exclude the first model
+            model_coords, model_residues, model_ids = self.get_ca_coordinates_and_residues(model)
+            distances = [None] * len(first_model_ids)
+            model_id_to_coord = {res_id: coord for res_id, coord in zip(model_ids, model_coords)}
+            for i, res_id in enumerate(first_model_ids):
+                if res_id in model_id_to_coord:
+                    distances[i] = np.linalg.norm(first_model_coords[i] - model_id_to_coord[res_id])
+            distances_per_model.append(distances)
+        return first_model_residues, distances_per_model
+
+    def bck_plot_distances(self, first_model_residues, output_name, distances_per_model):
+        colors = list(mcolors.TABLEAU_COLORS) * ((len(distances_per_model) // len(mcolors.TABLEAU_COLORS)) + 1)
+        plt.figure(figsize=(12, 8))
+        for i, distances in enumerate(distances_per_model):
+            plt.scatter(first_model_residues, distances, color=colors[i], label=self.name_list[i] if i < len(self.name_list) else f'Model {i+2}')
+        plt.title('Distance from Model 1 to Other Models')
+        plt.xlabel('Residue Name_Index')
+        plt.ylabel('Distance (Å)')
+        plt.legend(title='Model Comparison', bbox_to_anchor=(1.05, 1), loc='upper left')
+        ticks = range(0, len(first_model_residues), 10)
+        plt.xticks(ticks, [first_model_residues[i] for i in ticks], rotation=45)
+        plt.grid(True)
+        plt.tight_layout()
+        plt.savefig("/tmp/" + output_name)
+        self.streamlit_download_file(output_name, "/tmp/" + output_name)
+        # plt.show()
+    def plot_distances(self, first_model_residues, output_name, distances_per_model):
+        colors = list(mcolors.TABLEAU_COLORS) * ((len(distances_per_model) // len(mcolors.TABLEAU_COLORS)) + 1)
+        plt.figure(figsize=(12, 8))  # Size of the figure in inches
+        for i, distances in enumerate(distances_per_model):
+            plt.scatter(first_model_residues, distances, color=colors[i], label=self.name_list[i] if i < len(self.name_list) else f'Model {i+2}')
+        plt.title('Distance from Model 1 to Other Models')
+        plt.xlabel('Residue Name_Index')
+        plt.ylabel('Distance (Å)')
+        plt.legend(title='Model Comparison', bbox_to_anchor=(1.05, 1), loc='upper left')
+        ticks = range(0, len(first_model_residues), 10)
+        plt.xticks(ticks, [first_model_residues[i] for i in ticks], rotation=45)
+        plt.grid(True)
+        plt.tight_layout()
+
+        # Save the figure with a higher resolution
+        plt.savefig("/tmp/" + output_name, dpi=600)  # Increase the DPI for higher resolution
+        self.streamlit_download_file(output_name, "/tmp/" + output_name)
+    def streamlit_download_file(self, download_name, content_file):
+        # Download topol.top file  #      
+        # 打开 content_file 文件并读取其内容
+        with open(content_file, 'rb') as top_file:
+            content = top_file.read()   
+
+        #with open(content_file, 'r') as file:
+        #    lines = file.readlines()
+        #    st.write(f"after download, the file includes: {len(lines)}")
+
+            
+        # 添加一个下载按钮，传递 receptor_top_content 作为文件内容
+        st.download_button(
+            label = "Download " +  download_name,
+            data = content,
+            key = download_name,
+            file_name = download_name
+            )   
+##########################################################################################################################################################################################
+
+
+
 # Title
 st.title("Welcome to gmx tool box 1.7")
 
@@ -2567,4 +2657,33 @@ with contact_map:
             st.error("Failed to convert the Peptide, do you have the last column (atom type column) in you peptide PDB?")
     else:
         pass           
+
+    ### subcolum in column 4, for Calculate the superimposed models distances per residue ###
+    contact_map.subheader("Distances per residues' alpha carbon")
+    rmsd_pdb = st.file_uploader("Upload the Sperimposed multi-model pdb file", type=['pdb']) 
+    rmsd_name = st.text_area("Name list for the legend, e.g swiss itasser modeller", value="Model-1 Model-2 Model-3 Model-4 Model-5") 
+    # 将输入的字符串分割成列表
+    name_list = rmsd_name.split()  # 默认以空格分割
+    rmsd_output_name =  st.text_input("Output name", 'figure.png') 
+    # save the files name:
+    if rmsd_pdb and rmsd_name:
+        multimodel_pdb = rmsd_pdb.name
+    # 保存上传的文件到临时位置
+    if st.button('Plot') and rmsd_pdb and rmsd_name:
+        # 保存文件并获取临时文件路径
+        peptide_pdb_path = save_uploaded_file(rmsd_pdb)
+        # 如果文件保存成功，则进行合并
+        if peptide_pdb_path:
+            # with open(receptor_gro_path, 'r') as file:
+                # file_content = file.read()
+                # st.text(file_content)
+            rmsd = RMSD_per_Residue(peptide_pdb_path, rmsd_output_name, name_list)
+            first_model_residues, distances_per_model = rmsd.calculate_distances()
+            rmsd.plot_distances(first_model_residues, rmsd_output_name, distances_per_model)
+            # st.success("Peptide converted successfully!")
+        else:
+            st.error("Failed to plot the RMSD per residues, please delete the TER and CONNECT informations in the PDB file")
+    else:
+        pass      
+#################################################################################################################################################
 #################################################################################################################################################
