@@ -44,6 +44,9 @@ import csv
 import matplotlib.pyplot as plt
 # for plot dssp
 import json
+# for RMSD per Residue
+from Bio.PDB import PDBParser
+import matplotlib.colors as mcolors
 
 #################################################################################################################################################
 
