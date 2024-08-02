@@ -2257,7 +2257,6 @@ class RMSD_per_Residue():
         self.pdb_file = pdb_file
         self.name_list = name_list if name_list is not None else []
         self.pdb_parser = PDBParser(QUIET=True)
-        st.text(self.pdb_file)
         self.structure = self.pdb_parser.get_structure("Models", self.pdb_file)
         self.models = list(self.structure.get_models())
 
