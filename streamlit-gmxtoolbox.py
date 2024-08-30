@@ -953,7 +953,7 @@ class mr(): # read content from the uploaded file directly.
         
     def coordinator(self, num_neighbours, distance_value, atom_list, metal_list, residue_list):
         # find the atom index
-        st.text(atom_list)
+        # st.text(atom_list)
         if self.metal1 != 0:
             atom_distances = {}
             for i in range(len(self.index)):
