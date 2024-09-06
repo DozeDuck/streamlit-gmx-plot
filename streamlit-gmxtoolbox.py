@@ -2443,7 +2443,7 @@ class PDBModifier:
         return has_chain_id
 
     def parse_chain_info(self, resnumber_list):
-        if resnumber_list != None:
+        if resnumber_list != "None":
             chain_info = {}
             for item in resnumber_list:
                 chain_id, range_str = item.split(':')
