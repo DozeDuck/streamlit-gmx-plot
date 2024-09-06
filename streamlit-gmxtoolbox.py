@@ -2436,9 +2436,9 @@ class PDBModifier:
                     current_model.append(line)
                     self.models.append(current_model)
                     in_model = False
-            st.text("Number of atoms is: ", self.number_of_atoms_per_model)
-            st.text("Number of models is: ", self.number_of_models)
-            st.text("Number of residues is: ", self.number_of_residues/self.number_of_models)
+            st.text(f"Number of atoms is: {self.number_of_atoms_per_model}")
+            st.text(f"Number of models is: {self.number_of_models}")
+            st.text(f"Number of residues is: {self.number_of_residues/self.number_of_models}")
 
         return has_chain_id
 
