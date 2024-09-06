@@ -2368,7 +2368,7 @@ class PDBModifier:
 
         # 如果没有链ID，则添加链ID
         if not self.has_chain_id:
-            chain_info = self.parse_chain_info(resnumber) if resnumber else None
+            chain_info = self.parse_chain_info(resnumber)
             self.add_chain_id(chain_info=chain_info)
             self.write_pdb(output_filename)
 
@@ -2443,12 +2443,15 @@ class PDBModifier:
         return has_chain_id
 
     def parse_chain_info(self, resnumber_list):
-        chain_info = {}
-        for item in resnumber_list:
-            chain_id, range_str = item.split(':')
-            start, end = map(int, range_str.split('-'))
-            chain_info[chain_id] = (start, end)
-        # print(chain_info)
+        if resnumber_list != None:
+            chain_info = {}
+            for item in resnumber_list:
+                chain_id, range_str = item.split(':')
+                start, end = map(int, range_str.split('-'))
+                chain_info[chain_id] = (start, end)
+            # print(chain_info)
+        else:
+            chain_info = None
         
         return chain_info
 
