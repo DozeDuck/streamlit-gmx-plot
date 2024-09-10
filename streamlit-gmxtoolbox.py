@@ -2778,7 +2778,7 @@ with gromerge:
     ds_data = st.file_uploader("Upload the dssp.dat file", type=['dat'])
     ds_traj = st.file_uploader("Upload the trajectory file for time & residues", type=['pdb', 'xtc', 'trr']) 
     ds_output_name = st.text_input("Output file name", 'dssp.png')
-    ds_origianl = st.selectbox("Whether use full structure types", ['false', 'true'])
+    ds_origianl = st.selectbox("Whether use full structure types", ['true', 'false'])
     ds_unique_color = st.selectbox("Whether include a unique colorbar", ['true', 'false'])
     ds_original_map = st.text_area("Enter the full mapping in JSON format:", '{"H": 9, "B": 8, "E": 7, "G": 6, "I": 5, "P": 4, "S": 3, "T": 2, "=": 1, "~": 0}')
     ds_original_colorbar = st.text_area("Enter the full color bar:", '{"loop": 0, "break": 1, "h-bond turn": 2, "bend": 3, "kappa helix": 4, "pi helix": 5, "3_10 helix": 6, "strand": 7, "beta bridge": 8, "a-helix": 9}')
