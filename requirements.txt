@@ -5,4 +5,4 @@ mdanalysis
 matplotlib
 rpy2
 biopython
-zipfile
+zipfile36
