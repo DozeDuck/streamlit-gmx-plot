@@ -1688,7 +1688,8 @@ class renumber_MODEL():
                 # 使用正则表达式检查行是否包含"MODEL"和后面的数字
                 if re.match(r"^\s*MODEL\s+\d+", line):
                     # 替换匹配的行为"MODEL"后面接计数器的值，并将计数器加一
-                    new_line = re.sub(r"^\s*MODEL\s+\d+", f"MODEL        {count}", line)
+                    # new_line = re.sub(r"^\s*MODEL\s+\d+", f"MODEL        {count}", line)
+                    new_line = re.sub(r"^\s*MODEL\s+\d+", f"MODEL{count:9d}", line)
                     count += 1
                     output.write(new_line)
                     lines += 1
