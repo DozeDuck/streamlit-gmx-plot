@@ -1677,7 +1677,7 @@ class gmx_dssp():
             mime=mime_type)
 ##########################################################################################################################################################################################
 class renumber_MODEL():
-    def __init__(self, files):
+    def __init__(self, files, name):
         # 初始化计数器
         count = 1
         lines = 1
@@ -1696,11 +1696,11 @@ class renumber_MODEL():
                 else:
                     output.write(line)
                     lines += 1
-        #with open('/tmp/renumbered.pdb', 'r') as file:
+        #with open('/tmp/' + name +'_renumbered.pdb', 'r') as file:
         #    lines = file.readlines()
         #    st.write(f"before download, the file includes: {len(lines)}")
             
-        self.streamlit_download_file("renumbered.pdb", "/tmp/renumbered.pdb")            
+        self.streamlit_download_file(str(name) + "_renumbered.pdb", "/tmp/renumbered.pdb")            
         
     def streamlit_download_file(self, download_name, content_file):
         # Download topol.top file  #      
@@ -2679,7 +2679,7 @@ with mradder:
         extreme_pdb_path = save_uploaded_file(extreme_pdb)
         # 如果文件保存成功，则进行合并
         if extreme_pdb_path:
-            x = renumber_MODEL(extreme_pdb_path)
+            x = renumber_MODEL(extreme_pdb_path,extreme_pdb_name)
         else:
             st.error("Failed to renumber the pdb file, Do you have a MODEL line in your pdb file?")
     else:
