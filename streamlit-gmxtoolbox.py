@@ -1700,7 +1700,7 @@ class renumber_MODEL():
         #    lines = file.readlines()
         #    st.write(f"before download, the file includes: {len(lines)}")
             
-        self.streamlit_download_file(str(name) + "_renumbered.pdb", "/tmp/renumbered.pdb")            
+        self.streamlit_download_file(str(namea[:-4]) + "_renumbered.pdb", "/tmp/renumbered.pdb")            
         
     def streamlit_download_file(self, download_name, content_file):
         # Download topol.top file  #      
