@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Version 1.9: Add x_scale and y_scale for plotly;continus error band added, DSSP(+percentage plot), Renumber MODELS in PDB; modified the restraints adder function
+Version 2.0 Add x_scale and y_scale for plotly;continus error band added, DSSP(+percentage plot), Renumber MODELS in PDB; modified the restraints adder function; Fit to PLotly 6.0.0
 Created on Tue 16:15:48 2024-05-14
 
 @author: dozeduck
@@ -2581,7 +2581,7 @@ class PDBModifier:
 
 
 # Title
-st.title("Welcome to gmx tool box 1.9")
+st.title("Welcome to gmx tool box 2.0")
 
 # 创建4栏布局
 plot, mradder, gromerge, contact_map = st.columns(4)
