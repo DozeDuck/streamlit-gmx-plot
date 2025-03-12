@@ -2599,8 +2599,8 @@ class acpype4ligand():
 
             # 2) 调用 acpype 转换
             self.converter(new_path, charge_type)
-            files = os.listdir(ligand_names[i] + ".acpype")
-            st.text(files) 
+            # files = os.listdir(ligand_names[i] + ".acpype")
+            # st.text(files) 
 
         # 3) 打包 ACPYPE 输出并提供下载
         zip_buffer = self.create_zip_file_of_acpype_dirs()
