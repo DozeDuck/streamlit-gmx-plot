@@ -2594,7 +2594,7 @@ class acpype4ligand():
             old_path = mol2_files[i]
             ligand_name = ligand_names[i]+".mol2"
             new_path = os.path.join("/tmp", ligand_name)
-            st.text(new_path)
+            # st.text(new_path)
             os.rename(old_path, new_path)
 
             # 2) 调用 acpype 转换
