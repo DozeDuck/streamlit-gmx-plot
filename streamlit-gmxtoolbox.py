@@ -2908,6 +2908,30 @@ with gromerge:
     else:
         pass 
 
+    ### subcolum in column 3, for acpype converting ligand ###
+    gromerge.subheader("Acpype Converting Ligand")
+    acl_ligand = st.file_uploader("Upload the ligand mol2 file", accept_multiple_files=True, type=['mol2'])
+    acl_charge_type = st.selectbox("Charge Types", ['user', 'bcc']) 
+
+
+
+    # 保存上传的文件到临时位置
+    if st.button('convert') and acl_ligand:
+        # 保存上传文件的文件名
+        acl_ligand_names = [uploaded_file.name for uploaded_file in acl_ligand]
+        # Get rid of the subaddress
+        acl_ligand_names = [os.path.splitext(a)[0] for a in acl_ligand_names]
+        # st.text(acl_ligand_names)
+        # 保存上传的文件到临时位置
+        acl_ligand_path = [save_uploaded_file(acl_ligand[i]) for i in range(len(acl_ligand))]
+        # 如果文件保存成功，则进行合并
+        if acl_ligand_path:
+            x = acpype4ligand(acl_ligand_path, acl_ligand_names, acl_charge_type)
+            # st.success("Peptide converted successfully!")
+        else:
+            st.error("Failed to convert the Peptide, do you have the last column (atom type column) in you peptide PDB?")
+    else:
+        pass   
 # 在第4栏中添加内容
 with contact_map:
     st.header("Ligand contact map")
@@ -2939,30 +2963,7 @@ with contact_map:
         pass
 
     
-    ### subcolum in column 3, for acpype converting ligand ###
-    gromerge.subheader("Acpype Converting Ligand")
-    acl_ligand = st.file_uploader("Upload the ligand mol2 file", accept_multiple_files=True, type=['mol2'])
-    acl_charge_type = st.selectbox("Charge Types", ['user', 'bcc']) 
 
-
-
-    # 保存上传的文件到临时位置
-    if st.button('convert') and acl_ligand:
-        # 保存上传文件的文件名
-        acl_ligand_names = [uploaded_file.name for uploaded_file in acl_ligand]
-        # Get rid of the subaddress
-        acl_ligand_names = [os.path.splitext(a)[0] for a in acl_ligand_names]
-        # st.text(acl_ligand_names)
-        # 保存上传的文件到临时位置
-        acl_ligand_path = [save_uploaded_file(acl_ligand[i]) for i in range(len(acl_ligand))]
-        # 如果文件保存成功，则进行合并
-        if acl_ligand_path:
-            x = acpype4ligand(acl_ligand_path, acl_ligand_names, acl_charge_type)
-            # st.success("Peptide converted successfully!")
-        else:
-            st.error("Failed to convert the Peptide, do you have the last column (atom type column) in you peptide PDB?")
-    else:
-        pass   
 
     ### subcolum in column 4, for Calculate the superimposed models distances per residue ###
     contact_map.subheader("Distances per residues' alpha carbon")
