@@ -436,7 +436,7 @@ class plotly_go():
                 traces.append(go.Scatter(
                     x=x_data,
                     y=y,
-                    line=dict(color=Plotly[idx]),
+                    line=dict(color=Dark24[idx]),
                     mode='lines',
                     name=col_name_avg  # 使用列名作为轨迹名称
                 ))
