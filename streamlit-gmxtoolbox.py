@@ -374,8 +374,10 @@ class plotly_go():
                     mean_vals = df_data.mean(axis=1)
                     std_vals = df_data.std(axis=1)
                     # 将计算得到的平均值和标准差添加到相应的DataFrame中
-                    df_average[uploaded_filenames[(count-1)*3]] = mean_vals
-                    df_sd[uploaded_filenames[(count-1)*3]] = std_vals
+                    raw_name  = uploaded_filenames[(count-1)*3]
+                    legend    = os.path.splitext(os.path.basename(raw_name))[0]
+                    df_average[legend] = mean_vals
+                    df_sd[legend] = std_vals
                     # 重置df_data以便下一组的使用，并更新计数器
                     df_data = pd.DataFrame()
                     count += 1
