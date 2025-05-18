@@ -422,6 +422,7 @@ class plotly_go():
    
     def define_trace_for_error_bands(self, error_bar, df_average, df_sd, x_data, transparency):
         Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
+        Dark24 = ['#2E91E5', '#E15F99', '#1CA71C', '#FB0D0D', '#DA16FF', '#222A2A', '#B68100', '#750D86', '#EB663B', '#511CFB', '#00A08B', '#FB00D1', '#FC0080', '#B2828D', '#6C7C32', '#778AAE', '#862A16', '#A777F1', '#620042', '#1616A7', '#DA60CA', '#6C4516', '#0D2A63', '#AF0038']
         colors = ['rgb(0,100,80)', 'rgb(255,0,0)']  # 不同组使用不同颜色
         traces = []
         if error_bar =='error band':
@@ -430,7 +431,7 @@ class plotly_go():
                 y_std = df_sd[col_name_sd]
                 y_upper = y + y_std
                 y_lower = y - y_std
-                fill_color = self.hex_to_rgba(Plotly[idx], alpha=transparency)
+                fill_color = self.hex_to_rgba(Dark24[idx], alpha=transparency)
                 
                 traces.append(go.Scatter(
                     x=x_data,
