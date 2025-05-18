@@ -376,6 +376,7 @@ class plotly_go():
                     # 将计算得到的平均值和标准差添加到相应的DataFrame中
                     raw_name  = uploaded_filenames[(count-1)*3]
                     legend    = os.path.splitext(os.path.basename(raw_name))[0]
+                    legend   = legend[:-2]
                     df_average[legend] = mean_vals
                     df_sd[legend] = std_vals
                     # 重置df_data以便下一组的使用，并更新计数器
