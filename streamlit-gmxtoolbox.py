@@ -3019,4 +3019,27 @@ with contact_map:
     else:
         pass      
 #################################################################################################################################################
+    ### subcolum in column 4, for peptide convert to ligand ###
+    contact_map.subheader("Peptide to Ligand")
+    p2l_pdb = st.file_uploader("Upload the Peptide pdb file", accept_multiple_files=True, type=['pdb'])
+
+    p2l_name =  st.text_input("Give the peptide a name", 'PEP') 
+
+    # 保存上传的文件到临时位置
+    if st.button('convert') and p2l_pdb and p2l_name:
+        # 保存上传文件的文件名
+        uploaded_filenames = [uploaded_file.name for uploaded_file in p2l_pdb]
+        # 保存上传的文件到临时位置
+        peptide_pdb_path = [save_uploaded_file(p2l_pdb[i]) for i in range(len(p2l_pdb))]
+        # 如果文件保存成功，则进行合并
+        if peptide_pdb_path:
+            # with open(receptor_gro_path, 'r') as file:
+                # file_content = file.read()
+                # st.text(file_content)
+            x = pep2lig(peptide_pdb_path, uploaded_filenames, p2l_name)
+            # st.success("Peptide converted successfully!")
+        else:
+            st.error("Failed to convert the Peptide, do you have the last column (atom type column) in you peptide PDB?")
+    else:
+        pass 
 #################################################################################################################################################
