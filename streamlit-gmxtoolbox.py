@@ -3026,7 +3026,7 @@ with contact_map:
     p2l_name =  st.text_input("Give the peptide a name", 'PEP') 
 
     # 保存上传的文件到临时位置
-    if st.button('convert') and p2l_pdb and p2l_name:
+    if st.button('convert peptide') and p2l_pdb and p2l_name:
         # 保存上传文件的文件名
         uploaded_filenames = [uploaded_file.name for uploaded_file in p2l_pdb]
         # 保存上传的文件到临时位置
