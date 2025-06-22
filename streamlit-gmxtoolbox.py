@@ -772,6 +772,7 @@ class plotly_go():
 
     def plotly_free_energy(self, multi_files, output_name, plot_name, nbin, size, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, linewidth, transparency, x_low, x_high, y_low, y_high):
         Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
+        AMPK_color = ['#222A2A', '#FB0D0D', '#2E91E5'] # black red blue
         data, histogram_data, group_labels = [], [], []
         plot_title = 'Free Energy Surface'
         for i, file in enumerate(multi_files):
@@ -826,7 +827,8 @@ class plotly_go():
                 else:
                     y_name = yaxis_name
                 # 使用 define_trace 创建迹线
-                trace = self.define_trace(x_data, y_data, uploaded_filenames[i], Plotly[i % len(Plotly)], violine=violin)
+                # trace = self.define_trace(x_data, y_data, uploaded_filenames[i], Plotly[i % len(Plotly)], violine=violin)
+                trace = self.define_trace(x_data, y_data, uploaded_filenames[i], AMPK_color[i % len(AMPK_color)], violine=violin)
                 data.append(trace)
         if data != []:
            # 设置布局
