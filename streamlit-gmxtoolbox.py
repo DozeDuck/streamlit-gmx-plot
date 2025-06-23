@@ -79,13 +79,13 @@ class plotly_go():
             file1 = multi_files[0]
             self.flag_recognizer(file1, plot_name)
             if self.pca_flag != 1 and self.flag != 'pca' and self.flag != 'free energy':
-                self.plotly_multy(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high)
+                self.plotly_multy(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high, trace_color_scheme)
             elif self.pca_flag == 1:
                 self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, smooth, axis_show, line_width, x_low, x_high, y_low, y_high)
             elif self.flag == 'pca':
                 self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, smooth, axis_show, line_width, x_low, x_high, y_low, y_high)
             elif self.flag == 'free energy':
-                self.plotly_free_energy(multi_files, output_name, plot_name, nbin, size, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high)
+                self.plotly_free_energy(multi_files, output_name, plot_name, nbin, size, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high, trace_color_scheme)
 
     def flag_recognizer(self,file1, plot_name):                                                   # first method to be called in __main__, used for creating object and charactors.
         flags_map = {
@@ -634,8 +634,9 @@ class plotly_go():
         return np.convolve(y_data, np.ones(window_size) / window_size, mode='valid')
 
 
-    def plotly_multy(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, linewidth, transparency, x_low, x_high, y_low, y_high):
-        Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
+    def plotly_multy(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, linewidth, transparency, x_low, x_high, y_low, y_high, trace_color):
+        # Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
+        Plotly = trace_color
         data, histogram_data, group_labels = [], [], []
 
         # 读取plot_title, x_name, y_name
@@ -770,8 +771,9 @@ class plotly_go():
         # 使用 plot_graph 绘制图形
         self.plot_graph(data, layout, "Scatter_" + output_name)
 
-    def plotly_free_energy(self, multi_files, output_name, plot_name, nbin, size, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, linewidth, transparency, x_low, x_high, y_low, y_high):
-        Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
+    def plotly_free_energy(self, multi_files, output_name, plot_name, nbin, size, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, linewidth, transparency, x_low, x_high, y_low, y_high, trace_color):
+        # Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
+        Plotly = trace_color
         # AMPK_color = ['#222A2A', '#FB0D0D', '#2E91E5'] # black red blue
         # AMPK_color = ['#FB0D0D', '#2E91E5'] # black red blue
         # AMPK_color = ['#2E91E5'] # black red blue
