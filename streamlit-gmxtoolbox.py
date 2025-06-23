@@ -426,7 +426,6 @@ class plotly_go():
    
     def define_trace_for_error_bands(self, error_bar, df_average, df_sd, x_data, transparency, color_scheme):
         Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
-        st.text(Plotly)
         Plotly = color_scheme
         Dark24 = ['#2E91E5', '#E15F99', '#1CA71C', '#FB0D0D', '#DA16FF', '#222A2A', '#B68100', '#750D86', '#EB663B', '#511CFB', '#00A08B', '#FB00D1', '#FC0080', '#B2828D', '#6C7C32', '#778AAE', '#862A16', '#A777F1', '#620042', '#1616A7', '#DA60CA', '#6C4516', '#0D2A63', '#AF0038']
         AMPK_color = ['#222A2A', '#FB0D0D', '#2E91E5']
@@ -780,7 +779,11 @@ class plotly_go():
 
     def plotly_free_energy(self, multi_files, output_name, plot_name, nbin, size, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, linewidth, transparency, x_low, x_high, y_low, y_high, trace_color):
         # Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
-        Plotly = trace_color
+        Plotly = [
+                     c.strip()
+                     for c in re.split(r"[,\s]+", trace_color.strip())  # 逗号或任意空白都能分隔
+                     If C                                             # 去掉可能出现的空元素
+                 ]
         # AMPK_color = ['#222A2A', '#FB0D0D', '#2E91E5'] # black red blue
         # AMPK_color = ['#FB0D0D', '#2E91E5'] # black red blue
         # AMPK_color = ['#2E91E5'] # black red blue
