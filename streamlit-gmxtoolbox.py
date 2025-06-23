@@ -74,6 +74,7 @@ class plotly_go():
                  , nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency
                  , x_low, x_high, y_low, y_high, trace_color_scheme):
 
+
         if len(multi_files) >=1:
             # print(multi_files)
             file1 = multi_files[0]
@@ -636,7 +637,11 @@ class plotly_go():
 
     def plotly_multy(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, linewidth, transparency, x_low, x_high, y_low, y_high, trace_color):
         # Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
-        Plotly = trace_color
+        Plotly = [
+                    c.strip()
+                    for c in re.split(r"[,\s]+", trace_color.strip())  # 逗号或任意空白都能分隔
+                    if c                                             # 去掉可能出现的空元素
+                ]
         data, histogram_data, group_labels = [], [], []
 
         # 读取plot_title, x_name, y_name
