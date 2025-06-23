@@ -424,8 +424,9 @@ class plotly_go():
         # 将RGB整数值和透明度alpha组合成RGBA字符串
         return f"rgba({rgb[0]}, {rgb[1]}, {rgb[2]}, {alpha})"
    
-    def define_trace_for_error_bands(self, error_bar, df_average, df_sd, x_data, transparency):
+    def define_trace_for_error_bands(self, error_bar, df_average, df_sd, x_data, transparency, color_scheme):
         Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
+        Plotly = color_scheme
         Dark24 = ['#2E91E5', '#E15F99', '#1CA71C', '#FB0D0D', '#DA16FF', '#222A2A', '#B68100', '#750D86', '#EB663B', '#511CFB', '#00A08B', '#FB00D1', '#FC0080', '#B2828D', '#6C7C32', '#778AAE', '#862A16', '#A777F1', '#620042', '#1616A7', '#DA60CA', '#6C4516', '#0D2A63', '#AF0038']
         AMPK_color = ['#222A2A', '#FB0D0D', '#2E91E5']
         # AMPK_color = ['#2E91E5']
@@ -437,12 +438,12 @@ class plotly_go():
                 y_std = df_sd[col_name_sd]
                 y_upper = y + y_std
                 y_lower = y - y_std
-                fill_color = self.hex_to_rgba(AMPK_color[idx], alpha=transparency)
+                fill_color = self.hex_to_rgba(Plotly[idx], alpha=transparency)
                 
                 traces.append(go.Scatter(
                     x=x_data,
                     y=y,
-                    line=dict(color=AMPK_color[idx]),
+                    line=dict(color=Plotly[idx]),
                     mode='lines',
                     name=col_name_avg  # 使用列名作为轨迹名称
                 ))
@@ -716,7 +717,7 @@ class plotly_go():
 
         if error_bar != 'false':
             plot_title, x_name, y_name, traces_name_list = self.extract_plot_details(multi_files, plot_name, xaxis_name, yaxis_name, flag, histogram)
-            df_average, df_sd, x_data = self.calculate_for_error_bar_or_band(multi_files, x_name, replica_number, uploaded_filenames)
+            df_average, df_sd, x_data = self.calculate_for_error_bar_or_band(multi_files, x_name, replica_number, uploaded_filenames, Plotly)
             error_data = self.define_trace_for_error_bands(error_bar, df_average, df_sd, x_data, transparency)
             # change Time (ps) to Time (ns)
             if x_name == 'Time (ps)':
