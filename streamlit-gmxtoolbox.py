@@ -72,7 +72,7 @@ class plotly_go():
 
     def __init__(self, multi_files, output_name, renumber, rdf_cutoff, average, ls
                  , nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency
-                 , x_low, x_high, y_low, y_high):
+                 , x_low, x_high, y_low, y_high, trace_color_scheme):
 
         if len(multi_files) >=1:
             # print(multi_files)
@@ -2720,10 +2720,11 @@ with plot:
     margin_t  = st.number_input("top margin", min_value=0, step=10, value=60)
     margin_b  = st.number_input("bottom margin", min_value=0, step=10, value=100)
     font_color = st.color_picker("Font color", '#000000')
+    trace_color_scheme = st.text_area("Traces Color Scheme", value="#636EFA #EF553B #00CC96 #AB63FA #FFA15A #19D3F3 #FF6692 #B6E880 #FF97FF #FECB52")
     violin = st.selectbox("violin style", ['False', 'True'])
 
     if st.button('Plotting') and multi_files[0] != 0:
-        x = plotly_go(tmp_path, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, width_size, height_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, margin_l, margin_r, margin_t, margin_b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high)
+        x = plotly_go(tmp_path, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, width_size, height_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, margin_l, margin_r, margin_t, margin_b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high, trace_color_scheme)
 
 # 在第二栏中添加内容
 with mradder:
