@@ -1,0 +1,9 @@
+streamlit
+plotly
+kaleido==0.2.1       # 固定旧版，内置 Chrome
+mdanalysis
+matplotlib
+rpy2
+biopython
+zipfile36
+acpype
