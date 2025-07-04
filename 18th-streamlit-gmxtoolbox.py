@@ -2691,7 +2691,7 @@ with plot:
     renumber = st.selectbox("Renumber residues", ['false', 'true'])
     rdf_cutoff = st.number_input("RDF cutoff value", min_value=0.0, step=0.1, value=0.0)
     error_bar = st.selectbox("Error bar or Error band", ['false', 'error bar', 'error band'])
-    replica_number = st.number_input("Number of replicas", min_value=1, step=1, value=3)
+    replica_number = st.number_input("Number of replicas, name format: rmsd-1.xvg rmsd-2.xvg rmsd-3.xvg; you may change 'rmsd' to any name you like.", min_value=1, step=1, value=3)
     transparency = st.number_input("Number of transparent (for error band)", min_value=0.0, max_value=1.0, step=0.1, value=0.2)
     average = st.selectbox("Calculate average", ['false', 'true'])
     plot_name = st.text_input("Plot title", value="auto detect")
