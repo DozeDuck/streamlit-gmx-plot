@@ -72,7 +72,7 @@ class plotly_go():
 
     def __init__(self, multi_files, output_name, renumber, rdf_cutoff, average, ls
                  , nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency
-                 , x_low, x_high, y_low, y_high, trace_color_scheme):
+                 , x_low, x_high, y_low, y_high):
 
         if len(multi_files) >=1:
             # print(multi_files)
@@ -374,11 +374,8 @@ class plotly_go():
                     mean_vals = df_data.mean(axis=1)
                     std_vals = df_data.std(axis=1)
                     # 将计算得到的平均值和标准差添加到相应的DataFrame中
-                    raw_name  = uploaded_filenames[(count-1)*3]
-                    legend    = os.path.splitext(os.path.basename(raw_name))[0]
-                    legend   = legend[:-2]
-                    df_average[legend] = mean_vals
-                    df_sd[legend] = std_vals
+                    df_average[uploaded_filenames[(count-1)*3]] = mean_vals
+                    df_sd[uploaded_filenames[(count-1)*3]] = std_vals
                     # 重置df_data以便下一组的使用，并更新计数器
                     df_data = pd.DataFrame()
                     count += 1
@@ -425,9 +422,6 @@ class plotly_go():
    
     def define_trace_for_error_bands(self, error_bar, df_average, df_sd, x_data, transparency):
         Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
-        Dark24 = ['#2E91E5', '#E15F99', '#1CA71C', '#FB0D0D', '#DA16FF', '#222A2A', '#B68100', '#750D86', '#EB663B', '#511CFB', '#00A08B', '#FB00D1', '#FC0080', '#B2828D', '#6C7C32', '#778AAE', '#862A16', '#A777F1', '#620042', '#1616A7', '#DA60CA', '#6C4516', '#0D2A63', '#AF0038']
-        # AMPK_color = ['#222A2A', '#FB0D0D', '#2E91E5']
-        AMPK_color = ['#2E91E5']
         colors = ['rgb(0,100,80)', 'rgb(255,0,0)']  # 不同组使用不同颜色
         traces = []
         if error_bar =='error band':
@@ -436,12 +430,12 @@ class plotly_go():
                 y_std = df_sd[col_name_sd]
                 y_upper = y + y_std
                 y_lower = y - y_std
-                fill_color = self.hex_to_rgba(AMPK_color[idx], alpha=transparency)
+                fill_color = self.hex_to_rgba(Plotly[idx], alpha=transparency)
                 
                 traces.append(go.Scatter(
                     x=x_data,
                     y=y,
-                    line=dict(color=AMPK_color[idx]),
+                    line=dict(color=Plotly[idx]),
                     mode='lines',
                     name=col_name_avg  # 使用列名作为轨迹名称
                 ))
@@ -772,10 +766,6 @@ class plotly_go():
 
     def plotly_free_energy(self, multi_files, output_name, plot_name, nbin, size, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, linewidth, transparency, x_low, x_high, y_low, y_high):
         Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
-        # AMPK_color = ['#222A2A', '#FB0D0D', '#2E91E5'] # black red blue
-        # AMPK_color = ['#FB0D0D', '#2E91E5'] # black red blue
-        # AMPK_color = ['#2E91E5'] # black red blue
-
         data, histogram_data, group_labels = [], [], []
         plot_title = 'Free Energy Surface'
         for i, file in enumerate(multi_files):
@@ -831,7 +821,6 @@ class plotly_go():
                     y_name = yaxis_name
                 # 使用 define_trace 创建迹线
                 trace = self.define_trace(x_data, y_data, uploaded_filenames[i], Plotly[i % len(Plotly)], violine=violin)
-                # trace = self.define_trace(x_data, y_data, uploaded_filenames[i], AMPK_color[i % len(AMPK_color)], violine=violin) # 曾经用于AMPK 论文的设置
                 data.append(trace)
         if data != []:
            # 设置布局
@@ -2587,69 +2576,6 @@ class PDBModifier:
             key = download_name,
             file_name = download_name
             )
-
-
-##########################################################################################################################################################################################
-
-class acpype4ligand(): 
-    mol2_files      = []
-    charge_type     = "user"
-    ligand_names    = []
-
-    def __init__(self, mol2_files, ligand_names, charge_type):
-        self.mol2_files = mol2_files
-        self.charge_type = charge_type
-        
-        # 1) 移动/重命名上传的文件到 /tmp
-        for i in range(len(self.mol2_files)):
-            old_path = mol2_files[i]
-            ligand_name = ligand_names[i]+".mol2"
-            new_path = os.path.join("/tmp", ligand_name)
-            # st.text(new_path)
-            os.rename(old_path, new_path)
-
-            # 2) 调用 acpype 转换
-            self.converter(new_path, charge_type)
-            # files = os.listdir(ligand_names[i] + ".acpype")
-            # st.text(files) 
-
-        # 3) 打包 ACPYPE 输出并提供下载
-        zip_buffer = self.create_zip_file_of_acpype_dirs()
-        self.streamlit_download_zip_file(zip_buffer)    
-
-        # 4) 删除生成的文件夹
-        os.system("rm -r *.acpype")
-
-    def converter(self, ligand, charge_type):
-        # 注意: ACPYPE 通常会在同目录下生成一个 ligand_name.acpype/ 文件夹
-        os.system(f"acpype -i {ligand} -c {charge_type}")
-
-    def create_zip_file_of_acpype_dirs(self):
-        """只打包当前文件夹中所有 *.acpype 的目录，并返回一个 ZIP 的 BytesIO。"""
-        zip_buffer = io.BytesIO()
-
-        with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-            # 遍历当前目录，查找后缀为 .acpype 的目录
-            for item in os.listdir('.'):
-                if item.endswith('.acpype') and os.path.isdir(item):
-                    # 递归打包整个目录
-                    for root, dirs, files in os.walk(item):
-                        for file in files:
-                            full_path = os.path.join(root, file)
-                            # arcname要使用相对路径，以保持目录层级结构
-                            arcname = os.path.relpath(full_path, start='.')
-                            zip_file.write(full_path, arcname=arcname)
-
-        zip_buffer.seek(0)  # 将指针重置到开头，方便后续读取/下载
-        return zip_buffer      
-
-    def streamlit_download_zip_file(self, zip_buffer):
-        st.download_button(
-            label="Download Ligand Acpype Output as ZIP",
-            data=zip_buffer,
-            file_name="ligands_acpype.zip",
-            mime="application/zip"
-        )   
 ##########################################################################################################################################################################################
 
 
@@ -2720,11 +2646,10 @@ with plot:
     margin_t  = st.number_input("top margin", min_value=0, step=10, value=60)
     margin_b  = st.number_input("bottom margin", min_value=0, step=10, value=100)
     font_color = st.color_picker("Font color", '#000000')
-    trace_color_scheme = st.text_area("Traces Color Scheme", value="#636EFA #EF553B #00CC96 #AB63FA #FFA15A #19D3F3 #FF6692 #B6E880 #FF97FF #FECB52")
     violin = st.selectbox("violin style", ['False', 'True'])
 
     if st.button('Plotting') and multi_files[0] != 0:
-        x = plotly_go(tmp_path, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, width_size, height_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, margin_l, margin_r, margin_t, margin_b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high, trace_color_scheme)
+        x = plotly_go(tmp_path, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, width_size, height_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, margin_l, margin_r, margin_t, margin_b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high)
 
 # 在第二栏中添加内容
 with mradder:
@@ -2920,30 +2845,6 @@ with gromerge:
     else:
         pass 
 
-    ### subcolum in column 3, for acpype converting ligand ###
-    gromerge.subheader("Acpype Converting Ligand")
-    acl_ligand = st.file_uploader("Upload the ligand mol2 file", accept_multiple_files=True, type=['mol2'])
-    acl_charge_type = st.selectbox("Charge Types", ['user', 'bcc']) 
-
-
-
-    # 保存上传的文件到临时位置
-    if st.button('convert') and acl_ligand:
-        # 保存上传文件的文件名
-        acl_ligand_names = [uploaded_file.name for uploaded_file in acl_ligand]
-        # Get rid of the subaddress
-        acl_ligand_names = [os.path.splitext(a)[0] for a in acl_ligand_names]
-        # st.text(acl_ligand_names)
-        # 保存上传的文件到临时位置
-        acl_ligand_path = [save_uploaded_file(acl_ligand[i]) for i in range(len(acl_ligand))]
-        # 如果文件保存成功，则进行合并
-        if acl_ligand_path:
-            x = acpype4ligand(acl_ligand_path, acl_ligand_names, acl_charge_type)
-            # st.success("Peptide converted successfully!")
-        else:
-            st.error("Failed to convert the Peptide, do you have the last column (atom type column) in you peptide PDB?")
-    else:
-        pass   
 # 在第4栏中添加内容
 with contact_map:
     st.header("Ligand contact map")
@@ -2975,7 +2876,29 @@ with contact_map:
         pass
 
     
+    ### subcolum in column 4, for peptide convert to ligand ###
+    contact_map.subheader("Peptide to Ligand")
+    p2l_pdb = st.file_uploader("Upload the Peptide pdb file", accept_multiple_files=True, type=['pdb'])
 
+    p2l_name =  st.text_input("Give the peptide a name", 'PEP') 
+
+    # 保存上传的文件到临时位置
+    if st.button('convert') and p2l_pdb and p2l_name:
+        # 保存上传文件的文件名
+        uploaded_filenames = [uploaded_file.name for uploaded_file in p2l_pdb]
+        # 保存上传的文件到临时位置
+        peptide_pdb_path = [save_uploaded_file(p2l_pdb[i]) for i in range(len(p2l_pdb))]
+        # 如果文件保存成功，则进行合并
+        if peptide_pdb_path:
+            # with open(receptor_gro_path, 'r') as file:
+                # file_content = file.read()
+                # st.text(file_content)
+            x = pep2lig(peptide_pdb_path, uploaded_filenames, p2l_name)
+            # st.success("Peptide converted successfully!")
+        else:
+            st.error("Failed to convert the Peptide, do you have the last column (atom type column) in you peptide PDB?")
+    else:
+        pass           
 
     ### subcolum in column 4, for Calculate the superimposed models distances per residue ###
     contact_map.subheader("Distances per residues' alpha carbon")
@@ -3027,27 +2950,4 @@ with contact_map:
     else:
         pass      
 #################################################################################################################################################
-    ### subcolum in column 4, for peptide convert to ligand ###
-    contact_map.subheader("Peptide to Ligand")
-    p2l_pdb = st.file_uploader("Upload the Peptide pdb file", accept_multiple_files=True, type=['pdb'])
-
-    p2l_name =  st.text_input("Give the peptide a name", 'PEP') 
-
-    # 保存上传的文件到临时位置
-    if st.button('convert peptide') and p2l_pdb and p2l_name:
-        # 保存上传文件的文件名
-        uploaded_filenames = [uploaded_file.name for uploaded_file in p2l_pdb]
-        # 保存上传的文件到临时位置
-        peptide_pdb_path = [save_uploaded_file(p2l_pdb[i]) for i in range(len(p2l_pdb))]
-        # 如果文件保存成功，则进行合并
-        if peptide_pdb_path:
-            # with open(receptor_gro_path, 'r') as file:
-                # file_content = file.read()
-                # st.text(file_content)
-            x = pep2lig(peptide_pdb_path, uploaded_filenames, p2l_name)
-            # st.success("Peptide converted successfully!")
-        else:
-            st.error("Failed to convert the Peptide, do you have the last column (atom type column) in you peptide PDB?")
-    else:
-        pass 
 #################################################################################################################################################
