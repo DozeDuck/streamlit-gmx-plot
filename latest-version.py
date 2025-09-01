@@ -72,7 +72,7 @@ class plotly_go():
 
     def __init__(self, multi_files, output_name, renumber, rdf_cutoff, average, ls
                  , nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency
-                 , x_low, x_high, y_low, y_high, traces_color_schemes):
+                 , x_low, x_high, y_low, y_high, traces_color_schemes, pca_color_by_replicas):
         trace_color_scheme = [
             c.strip()
             for c in re.split(r"[,\s]+", traces_color_schemes.strip())  # 逗号或任意空白都能分隔
@@ -80,15 +80,16 @@ class plotly_go():
         ]
 
         if len(multi_files) >=1:
+            pca_color_by_replica = int(pca_color_by_replicas)
             # print(multi_files)
             file1 = multi_files[0]
             self.flag_recognizer(file1, plot_name)
             if self.pca_flag != 1 and self.flag != 'pca' and self.flag != 'free energy':
                 self.plotly_multy(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high, trace_color_scheme)
             elif self.pca_flag == 1:
-                self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, smooth, axis_show, line_width, x_low, x_high, y_low, y_high)
+                self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, smooth, axis_show, line_width, x_low, x_high, y_low, y_high, trace_color_scheme, pca_color_by_replica)
             elif self.flag == 'pca':
-                self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, smooth, axis_show, line_width, x_low, x_high, y_low, y_high)
+                self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, smooth, axis_show, line_width, x_low, x_high, y_low, y_high, trace_color_scheme, pca_color_by_replica)
             elif self.flag == 'free energy':
                 self.plotly_free_energy(multi_files, output_name, plot_name, nbin, size, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high, trace_color_scheme)
 
@@ -639,6 +640,24 @@ class plotly_go():
         # 计算移动平均
         return np.convolve(y_data, np.ones(window_size) / window_size, mode='valid')
 
+    
+    def split_even_ranges(self, n_points: int, k: int):
+        """
+        将 n_points 个点平均切分为 k 组，返回 [(start, end), ...] 半开区间。
+        前 remainder 个分组多 1 个点，保证尽可能均分。
+        """
+        k = max(1, min(k, n_points))  # 防越界
+        base = n_points // k
+        rem  = n_points %  k
+        ranges = []
+        start = 0
+        for i in range(k):
+            size = base + (1 if i < rem else 0)
+            end  = start + size
+            ranges.append((start, end))
+            start = end
+        return ranges
+
 
     def plotly_multy(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, linewidth, transparency, x_low, x_high, y_low, y_high, trace_color):
         # Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
@@ -725,9 +744,12 @@ class plotly_go():
             error_layout = self.setup_layout(plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t , b, x_low, x_high, y_low, y_high, violine=violin, axis_shows=axis_show, line_width=linewidth)
             self.plot_graph(error_data, error_layout, "error_bar_" + output_name)
 
-    def plotly_pca(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l, r, t ,b, smooth, axis_show, linewidth, x_low, x_high, y_low, y_high):
+    def plotly_pca(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l, r, t ,b, smooth, axis_show, linewidth, x_low, x_high, y_low, y_high, trace_color, pca_color_by_replica):
         data = []
-        color = ['rainbow']
+        if pca_color_by_replica == 0:
+            color = ['rainbow']
+        elif pca_color_by_replica !=0:
+            color = trace_color[:pca_color_by_replica]
         # labels = []
         # 使用 extract_plot_details 方法获取图表标题和轴标签
         plot_title, x_name, y_name, traces_name_list = self.extract_plot_details(multi_files, plot_name, xaxis_name, yaxis_name, flag, histogram)
@@ -736,7 +758,7 @@ class plotly_go():
         if yaxis_name == 'auto detect':
             y_name = 'PC2 (nm)'
     # 处理 PCA 数据
-        if smooth != 'true':
+        if smooth != 'true' and pca_color_by_replica == 0:
             if multi_files[0].endswith(".xvg"):
                 for i, file in enumerate(multi_files):          
                     x_data, y_data, _ = self.read_data_xvg(file, "PC1", renumber)  # 假设 "PC1" 和 "PC2" 是合适的轴名称
@@ -753,6 +775,25 @@ class plotly_go():
                     data.append(trace)
             layout = self.setup_layout(plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t ,b, x_low, x_high, y_low, y_high, flag=flag, axis_shows=axis_show, line_width=linewidth)
 
+        elif smooth != 'true' and pca_color_by_replica != 0:
+            number_replicas = pca_color_by_replica
+            if multi_files[0].endswith(".xvg"):
+                for i, file in enumerate(multi_files):          
+                    x_data, y_data, _ = self.read_data_xvg(file, "PC1", renumber)  # 假设 "PC1" 和 "PC2" 是合适的轴名称
+                    labels = ["replica-" + str(x+1) for x in range(number_replicas)]
+                    n=len(y_data)
+                    ranges = self.split_even_ranges(n, number_replicas)
+                    for j, (a, bb) in enumerate(ranges):
+                        labels = list(range(a, bb))
+                        # legend 名称：文件名 + 分段编号
+                        trace_name = f"{file} · replica-{j+1}"
+                        trace = self.define_trace(
+                            x_data[a:bb], y_data[a:bb], trace_name,
+                            colors[j], flag=flag, labels=labels
+                        )
+                        data.append(trace)
+
+        
         elif smooth == 'true':
             if multi_files[0].endswith(".xvg"):
                 for i, file in enumerate(multi_files):          
@@ -2696,6 +2737,7 @@ with plot:
     average = st.selectbox("Calculate average", ['false', 'true'])
     plot_name = st.text_input("Plot title", value="auto detect")
     smooth = st.selectbox("Heatmap style", ['false', 'true'])
+    pca_color_by_replicas = st.text_input("Whether color the pca dots by the order of replicas", value="0")
     nbin = st.number_input("Number of bins (for PCA set to 6)", min_value=1, step=1, value=6)
     size = st.number_input("Size (for PCA)", min_value=1, step=1, value=500)
     move_average = st.number_input("Window size for moving average", min_value=0, step=1, value=0)
@@ -2732,7 +2774,7 @@ with plot:
     violin = st.selectbox("violin style", ['False', 'True'])
 
     if st.button('Plotting') and multi_files[0] != 0:
-        x = plotly_go(tmp_path, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, width_size, height_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, margin_l, margin_r, margin_t, margin_b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high, trace_color_scheme)
+        x = plotly_go(tmp_path, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, width_size, height_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, margin_l, margin_r, margin_t, margin_b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high, trace_color_scheme, pca_color_by_replicas)
 
 # 在第二栏中添加内容
 with mradder:
