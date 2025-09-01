@@ -339,9 +339,9 @@ class plotly_go():
         return plot_title, x_name, y_name, traces_name_list
 
 
-    def define_trace(self, x_data, y_data, file_name, colour, violine='False', flag=0, labels=0, smooth=0):
+    def define_trace(self, x_data, y_data, file_name, colour, violine='False', flag=0, labels=0, smooth=0, number_replicas=0):
         # 创建并返回迹线
-        if flag == 'pca' and smooth != 'true':
+        if flag == 'pca' and smooth != 'true' and number_replicas == 0:
             trace = go.Scatter(
                 x=x_data,
                 y=y_data,
@@ -350,6 +350,19 @@ class plotly_go():
                     color=labels,  # 设置颜色为标签的数值
                     colorscale=colour,  # 颜色映射，你可以根据需要选择不同的颜色映射
                     colorbar=dict(title='Conformation Number'),  # 添加颜色条
+                ),
+            )
+        elif flag == 'pca' and smooth != 'true' and number_replicas != 0:
+            trace = go.Scatter(
+                x=x_data,
+                y=y_data,
+                mode='markers',
+                name=str(file_name),
+                marker=dict(
+                    color=labels,
+                    colorscale=colour if isinstance(colour, str) else 'Rainbow',
+                    colorbar=dict(title='Conformation Number'),
+                    showscale=True
                 ),
             )
         elif flag =='pca' and smooth == 'true':
@@ -789,7 +802,7 @@ class plotly_go():
                         trace_name = f"{file} · replica-{j+1}"
                         trace = self.define_trace(
                             x_data[a:bb], y_data[a:bb], trace_name,
-                            color[j], flag=flag, labels=labels
+                            color[j], flag=flag, labels=labels, number_replicas=pca_color_by_replica
                         )
                         data.append(trace)
 
