@@ -789,7 +789,7 @@ class plotly_go():
                         trace_name = f"{file} · replica-{j+1}"
                         trace = self.define_trace(
                             x_data[a:bb], y_data[a:bb], trace_name,
-                            colors[j], flag=flag, labels=labels
+                            color[j], flag=flag, labels=labels
                         )
                         data.append(trace)
 
