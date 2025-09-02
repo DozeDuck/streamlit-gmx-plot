@@ -360,7 +360,7 @@ class plotly_go():
                         name=f"replica-{replica_th+1}",
                         marker=dict(color=colors[replica_th])
                     )
-            )
+            
         elif flag =='pca' and smooth == 'true':
             trace = go.Heatmap(z=x_data, colorscale='Viridis', showscale=True, connectgaps=True, zsmooth='best')
         elif flag =='angle' and smooth == 'true':
