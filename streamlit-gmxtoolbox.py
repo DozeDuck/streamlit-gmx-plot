@@ -801,6 +801,7 @@ class plotly_go():
                             color[j], j, flag=flag, labels=labels, number_replicas=pca_color_by_replica
                         )
                         data.append(trace)
+            layout = self.setup_layout(plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t ,b, x_low, x_high, y_low, y_high, flag=flag, axis_shows=axis_show, line_width=linewidth)
 
         
         elif smooth == 'true':
