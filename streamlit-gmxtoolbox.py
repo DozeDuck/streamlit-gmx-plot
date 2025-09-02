@@ -481,10 +481,12 @@ class plotly_go():
                 ))
         return traces
 
-    def setup_layout(self, plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l,r,t,b, x_low, x_high, y_low, y_high, violine='False', flag=0, axis_shows='True', line_width=2):
+    def setup_layout(self, plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l,r,t,b, x_low, x_high, y_low, y_high, violine='False', flag=0, axis_shows='True', line_width=2, replica_th=0):
         # 设置布局
-        if flag == 'pca':
+        if flag == 'pca' and replica_th == 0:
             legend_show = False
+        if flag == 'pca' and replica_th != 0:
+            legend_show = True            
         if violine != 'False':
             x_name = ''
         if y_low == y_high == 0:
@@ -801,7 +803,7 @@ class plotly_go():
                             color[j], j, flag=flag, labels=labels, number_replicas=pca_color_by_replica
                         )
                         data.append(trace)
-            layout = self.setup_layout(plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t ,b, x_low, x_high, y_low, y_high, flag=flag, axis_shows=axis_show, line_width=linewidth)
+            layout = self.setup_layout(plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t ,b, x_low, x_high, y_low, y_high, flag=flag, axis_shows=axis_show, line_width=linewidth, replica_th=pca_color_by_replica)
 
         
         elif smooth == 'true':
