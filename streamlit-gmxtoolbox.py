@@ -358,7 +358,7 @@ class plotly_go():
                         y=y_data,
                         mode='markers',
                         name=f"replica-{replica_th+1}",
-                        marker=dict(color=colors[replica_th])
+                        marker=dict(color=colour)
                     )
             
         elif flag =='pca' and smooth == 'true':
