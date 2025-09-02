@@ -339,7 +339,7 @@ class plotly_go():
         return plot_title, x_name, y_name, traces_name_list
 
 
-    def define_trace(self, x_data, y_data, file_name, colour, violine='False', flag=0, labels=0, smooth=0, number_replicas=0):
+    def define_trace(self, x_data, y_data, file_name, colour, replica_th, violine='False', flag=0, labels=0, smooth=0, number_replicas=0):
         # 创建并返回迹线
         if flag == 'pca' and smooth != 'true' and number_replicas == 0:
             trace = go.Scatter(
@@ -353,17 +353,13 @@ class plotly_go():
                 ),
             )
         elif flag == 'pca' and smooth != 'true' and number_replicas != 0:
-            trace = go.Scatter(
-                x=x_data,
-                y=y_data,
-                mode='markers',
-                name=str(file_name),
-                marker=dict(
-                    color=labels,
-                    colorscale=colour if isinstance(colour, str) else 'Rainbow',
-                    colorbar=dict(title='Conformation Number'),
-                    showscale=True
-                ),
+            go.Scatter(
+                        x=x_data,
+                        y=y_data,
+                        mode='markers',
+                        name=f"replica-{replica_th+1}",
+                        marker=dict(color=colors[replica_th])
+                    )
             )
         elif flag =='pca' and smooth == 'true':
             trace = go.Heatmap(z=x_data, colorscale='Viridis', showscale=True, connectgaps=True, zsmooth='best')
