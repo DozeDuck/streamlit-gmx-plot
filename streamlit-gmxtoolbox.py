@@ -353,7 +353,7 @@ class plotly_go():
                 ),
             )
         elif flag == 'pca' and smooth != 'true' and number_replicas != 0:
-            go.Scatter(
+            trace = go.Scatter(
                         x=x_data,
                         y=y_data,
                         mode='markers',
