@@ -685,9 +685,9 @@ class plotly_go():
                 density_matrix = self.pca_bins_density_define(nbin, points)
                 # 使用 define_trace 创建迹线
                 if smooth == 'true':
-                    trace = self.define_trace(density_matrix, density_matrix, file, 'rainbow', flag=flag, smooth=smooth)  # 假设使用 'rainbow' 作为颜色
+                    trace = self.define_trace(density_matrix, density_matrix, file, 'rainbow', i, flag=flag, smooth=smooth)  # 假设使用 'rainbow' 作为颜色
                 else:
-                    trace = self.define_trace(x_data, y_data, uploaded_filenames[i], Plotly[i % len(Plotly)], violine=violin)
+                    trace = self.define_trace(x_data, y_data, uploaded_filenames[i], Plotly[i % len(Plotly)], i, violine=violin)
                 data.append(trace)
                 # 添加直方图数据
                 if histogram == 'true':
@@ -700,9 +700,9 @@ class plotly_go():
                 density_matrix = self.pca_bins_density_define(nbin, points)
                 # 使用 define_trace 创建迹线
                 if smooth == 'true':
-                    trace = self.define_trace(density_matrix, density_matrix, file, 'rainbow', flag=flag, smooth=smooth)  # 假设使用 'rainbow' 作为颜色
+                    trace = self.define_trace(density_matrix, density_matrix, file, 'rainbow', i,  flag=flag, smooth=smooth)  # 假设使用 'rainbow' 作为颜色
                 else:
-                    trace = self.define_trace(x_data, y_data, uploaded_filenames[i], Plotly[i % len(Plotly)], violine=violin)
+                    trace = self.define_trace(x_data, y_data, uploaded_filenames[i], Plotly[i % len(Plotly)], i, violine=violin)
                 data.append(trace)
     
                 # 添加直方图数据
@@ -727,7 +727,7 @@ class plotly_go():
         # 处理平均值
         if average == 'true':
             average_data = self.calculate_average(multi_files, xaxis_name, renumber)
-            average_trace = self.define_trace(x_data, average_data, "Average", 'black')
+            average_trace = self.define_trace(x_data, average_data, "Average", 'black', i)
             # data.append(average_trace)
             data = average_trace
             self.plot_graph(data, layout, "Average_" + output_name)
