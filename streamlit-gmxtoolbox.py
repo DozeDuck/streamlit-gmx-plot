@@ -804,7 +804,7 @@ class plotly_go():
 
         if error_bar != 'false':
             plot_title, x_name, y_name, traces_name_list = self.extract_plot_details(multi_files, plot_name, xaxis_name, yaxis_name, flag, histogram)
-            df_average, df_sd, x_data = self.calculate_for_error_bar_or_band(multi_files, x_name, replica_counts, uploaded_filenames)
+            df_average, df_sd, x_data = self.calculate_for_error_bar_or_band(multi_files, x_name, replica_counts, uploaded_filenames, renumber)
             error_data = self.define_trace_for_error_bands(error_bar, df_average, df_sd, x_data, transparency, Plotly)
             # change Time (ps) to Time (ns)
             if x_name == 'Time (ps)':
