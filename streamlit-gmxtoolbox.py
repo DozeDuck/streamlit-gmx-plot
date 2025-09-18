@@ -2750,6 +2750,28 @@ with plot:
     "Replica counts（支持单个或多个，示例：3 或 3,2,4）\n"
     "单个数字=所有组副本相同；多个数字=按上传顺序逐组对应。", 
     value="3")
+    ### for the plotly function to make sure the replicas count fit the inputs files count
+    def parse_replica_counts(text: str, n_files: int):
+        text = (text or "").strip()
+        if not text:
+            return None, "请输入 replica 数量（如 3 或 3,2,4）。"
+        parts = [p for p in re.split(r"[,\s]+", text) if p]
+        try:
+            nums = [int(p) for p in parts]
+        except ValueError:
+            return None, "replica 数量必须是整数，可用逗号或空格分隔。"
+        if any(n <= 0 for n in nums):
+            return None, "所有 replica 数量必须 > 0。"
+    
+        if len(nums) == 1:
+            k = nums[0]
+            if n_files % k != 0:
+                return None, f"当前上传文件数 {n_files} 不能被统一的副本数 {k} 整除。"
+            return [k] * (n_files // k), None
+        else:
+            if sum(nums) != n_files:
+                return None, f"提供的副本数之和 {sum(nums)} 必须等于上传文件数 {n_files}。"
+            return nums, None
     # 解析 & 预览（double check）
     group_sizes, parse_err = (None, None)
     if multi_files and error_bar != "false":
@@ -3134,27 +3156,6 @@ with contact_map:
     else:
         pass 
 #################################################################################################################################################
-### for the plotly function to make sure the replicas count fit the inputs files count
-def parse_replica_counts(text: str, n_files: int):
-    text = (text or "").strip()
-    if not text:
-        return None, "请输入 replica 数量（如 3 或 3,2,4）。"
-    parts = [p for p in re.split(r"[,\s]+", text) if p]
-    try:
-        nums = [int(p) for p in parts]
-    except ValueError:
-        return None, "replica 数量必须是整数，可用逗号或空格分隔。"
-    if any(n <= 0 for n in nums):
-        return None, "所有 replica 数量必须 > 0。"
 
-    if len(nums) == 1:
-        k = nums[0]
-        if n_files % k != 0:
-            return None, f"当前上传文件数 {n_files} 不能被统一的副本数 {k} 整除。"
-        return [k] * (n_files // k), None
-    else:
-        if sum(nums) != n_files:
-            return None, f"提供的副本数之和 {sum(nums)} 必须等于上传文件数 {n_files}。"
-        return nums, None
 
 
