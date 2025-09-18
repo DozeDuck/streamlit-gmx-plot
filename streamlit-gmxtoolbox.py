@@ -2809,23 +2809,23 @@ with plot:
     def parse_replica_counts(text: str, n_files: int):
         text = (text or "").strip()
         if not text:
-            return None, "请输入 replica 数量（如 3 或 3,2,4）。"
+            return None, "Input replica counts（e.g： 3 or 3,2,4 or 3 2 4）。"
         parts = [p for p in re.split(r"[,\s]+", text) if p]
         try:
             nums = [int(p) for p in parts]
         except ValueError:
-            return None, "replica 数量必须是整数，可用逗号或空格分隔。"
+            return None, "replica count has to be integer，can be seperated by , or space。"
         if any(n <= 0 for n in nums):
-            return None, "所有 replica 数量必须 > 0。"
+            return None, "All replica count must > 0。"
     
         if len(nums) == 1:
             k = nums[0]
             if n_files % k != 0:
-                return None, f"当前上传文件数 {n_files} 不能被统一的副本数 {k} 整除。"
+                return None, f"the current uploaded files count {n_files} not divisible by the unified number of replicas {k}。"
             return [k] * (n_files // k), None
         else:
             if sum(nums) != n_files:
-                return None, f"提供的副本数之和 {sum(nums)} 必须等于上传文件数 {n_files}。"
+                return None, f"The sum of provided replicas counts {sum(nums)} must eaqual to the uploaded files count {n_files}。"
             return nums, None
     # 解析 & 预览（double check）
     group_sizes, parse_err = (None, None)
@@ -2835,7 +2835,7 @@ with plot:
         if parse_err:
             st.error(parse_err)
         else:
-            st.caption("Replica 分组预览（按上传顺序）：")
+            st.caption("Replica Group preview (by upload order)：")
             rows, idx = [], 0
             for gi, gsize in enumerate(group_sizes, start=1):
                 files = uploaded_filenames[idx: idx + gsize]
