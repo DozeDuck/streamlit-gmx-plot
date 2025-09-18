@@ -2747,9 +2747,7 @@ with plot:
     # replica_number = st.number_input("Number of replicas, name format: rmsd-1.xvg rmsd-2.xvg rmsd-3.xvg; you may change 'rmsd' to any name you like.", min_value=1, step=1, value=3)
     ###
     replica_counts_text = st.text_input(
-    "Replica counts（支持单个或多个，示例：3 或 3,2,4）\n"
-    "单个数字=所有组副本相同；多个数字=按上传顺序逐组对应。", 
-    value="3")
+    "Replica counts (Single or multiple, example: 3 or 3,2,4 or 3 3 2) \n" "Single number = all group copies are the same; multiple numbers = each group corresponds in the upload order", value="3")
     ### for the plotly function to make sure the replicas count fit the inputs files count
     def parse_replica_counts(text: str, n_files: int):
         text = (text or "").strip()
