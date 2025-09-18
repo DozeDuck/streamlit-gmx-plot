@@ -2744,7 +2744,28 @@ with plot:
     renumber = st.selectbox("Renumber residues", ['false', 'true'])
     rdf_cutoff = st.number_input("RDF cutoff value", min_value=0.0, step=0.1, value=0.0)
     error_bar = st.selectbox("Error bar or Error band", ['false', 'error bar', 'error band'])
-    replica_number = st.number_input("Number of replicas, name format: rmsd-1.xvg rmsd-2.xvg rmsd-3.xvg; you may change 'rmsd' to any name you like.", min_value=1, step=1, value=3)
+    # replica_number = st.number_input("Number of replicas, name format: rmsd-1.xvg rmsd-2.xvg rmsd-3.xvg; you may change 'rmsd' to any name you like.", min_value=1, step=1, value=3)
+    ###
+    replica_counts_text = st.text_input(
+    "Replica counts（支持单个或多个，示例：3 或 3,2,4）\n"
+    "单个数字=所有组副本相同；多个数字=按上传顺序逐组对应。", 
+    value="3")
+    # 解析 & 预览（double check）
+    group_sizes, parse_err = (None, None)
+    if multi_files and error_bar != "false":
+        group_sizes, parse_err = parse_replica_counts(replica_counts_text, len(multi_files))
+    
+        if parse_err:
+            st.error(parse_err)
+        else:
+            st.caption("Replica 分组预览（按上传顺序）：")
+            rows, idx = [], 0
+            for gi, gsize in enumerate(group_sizes, start=1):
+                files = uploaded_filenames[idx: idx + gsize]
+                rows.append({"Group": gi, "Replicas": gsize, "Files": ", ".join(files)})
+                idx += gsize
+            st.table(pd.DataFrame(rows))
+    ###
     transparency = st.number_input("Number of transparent (for error band)", min_value=0.0, max_value=1.0, step=0.1, value=0.2)
     average = st.selectbox("Calculate average", ['false', 'true'])
     plot_name = st.text_input("Plot title", value="auto detect")
@@ -3113,3 +3134,27 @@ with contact_map:
     else:
         pass 
 #################################################################################################################################################
+### for the plotly function to make sure the replicas count fit the inputs files count
+def parse_replica_counts(text: str, n_files: int):
+    text = (text or "").strip()
+    if not text:
+        return None, "请输入 replica 数量（如 3 或 3,2,4）。"
+    parts = [p for p in re.split(r"[,\s]+", text) if p]
+    try:
+        nums = [int(p) for p in parts]
+    except ValueError:
+        return None, "replica 数量必须是整数，可用逗号或空格分隔。"
+    if any(n <= 0 for n in nums):
+        return None, "所有 replica 数量必须 > 0。"
+
+    if len(nums) == 1:
+        k = nums[0]
+        if n_files % k != 0:
+            return None, f"当前上传文件数 {n_files} 不能被统一的副本数 {k} 整除。"
+        return [k] * (n_files // k), None
+    else:
+        if sum(nums) != n_files:
+            return None, f"提供的副本数之和 {sum(nums)} 必须等于上传文件数 {n_files}。"
+        return nums, None
+
+
