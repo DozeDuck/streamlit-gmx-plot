@@ -71,7 +71,7 @@ class plotly_go():
     multi_flag = ''
 
     def __init__(self, multi_files, output_name, renumber, rdf_cutoff, average, ls
-                 , nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency
+                 , nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_counts, axis_show, line_width, transparency
                  , x_low, x_high, y_low, y_high, traces_color_schemes, pca_color_by_replicas):
         trace_color_scheme = [
             c.strip()
@@ -85,13 +85,13 @@ class plotly_go():
             file1 = multi_files[0]
             self.flag_recognizer(file1, plot_name)
             if self.pca_flag != 1 and self.flag != 'pca' and self.flag != 'free energy':
-                self.plotly_multy(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high, trace_color_scheme)
+                self.plotly_multy(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_counts, axis_show, line_width, transparency, x_low, x_high, y_low, y_high, trace_color_scheme)
             elif self.pca_flag == 1:
                 self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, smooth, axis_show, line_width, x_low, x_high, y_low, y_high, trace_color_scheme, pca_color_by_replica)
             elif self.flag == 'pca':
                 self.plotly_pca(multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, smooth, axis_show, line_width, x_low, x_high, y_low, y_high, trace_color_scheme, pca_color_by_replica)
             elif self.flag == 'free energy':
-                self.plotly_free_energy(multi_files, output_name, plot_name, nbin, size, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high, trace_color_scheme)
+                self.plotly_free_energy(multi_files, output_name, plot_name, nbin, size, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, self.flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_counts, axis_show, line_width, transparency, x_low, x_high, y_low, y_high, trace_color_scheme)
 
     def flag_recognizer(self,file1, plot_name):                                                   # first method to be called in __main__, used for creating object and charactors.
         flags_map = {
@@ -373,7 +373,64 @@ class plotly_go():
             trace = go.Scatter(x=x_data, y=y_data, line=dict(color=colour), name=str(file_name).split('.')[0])
         return trace
 
-    def calculate_for_error_bar_or_band(self, multi_files, x_name, replica_number, uploaded_filenames):
+    def _legend_from_filename(self, raw_name: str) -> str:
+        # 由首个文件名推断组名：移除末尾的数字序号（-1/_1/ 1 等）
+        legend = os.path.splitext(os.path.basename(raw_name))[0]
+        legend = re.sub(r"([_\-\s]?)(\d+)$", "", legend) or legend
+        return legend
+    
+    def calculate_for_error_bar_or_band(self, multi_files, x_name, replica_counts, uploaded_filenames, renumber):
+        """
+        replica_counts: list[int]，例如 [3] 或 [3,2,4]。
+        按上传顺序分组：前 3 个为第 1 组，接下来的 2 个为第 2 组，以此类推。
+        """
+        df_average = pd.DataFrame()
+        df_sd = pd.DataFrame()
+        x_datas = None
+    
+        # 选择读取函数（按扩展名）
+        def _read_one(file_path):
+            if file_path.endswith(".xvg"):
+                return self.read_data_xvg(file_path, x_name, renumber)[:2]  # (x, y)
+            elif file_path.endswith(".csv"):
+                return self.read_data_csv(file_path, x_name, renumber)[:2]
+            elif file_path.endswith(".dat"):
+                # read_data_dat 返回 (x, y, z, df, idx_free, col_names) —— 仅取 x,y
+                ret = self.read_data_dat(file_path, x_name, renumber)
+                return ret[0], ret[1]
+            else:
+                raise ValueError(f"Unsupported file type: {file_path}")
+    
+        idx = 0
+        for gi, gsize in enumerate(replica_counts, start=1):
+            group_files = multi_files[idx: idx + gsize]
+            if len(group_files) != gsize:
+                raise ValueError(f"组 {gi} 期望 {gsize} 个文件，但仅找到 {len(group_files)}。")
+    
+            df_group = pd.DataFrame()
+            for j, file_path in enumerate(group_files, start=1):
+                x_data, y_data = _read_one(file_path)
+                if x_datas is None:
+                    x_datas = x_data
+                df_group[f'y_{j}'] = y_data
+    
+            mean_vals = df_group.mean(axis=1)
+            std_vals  = df_group.std(axis=1)
+    
+            # 组图例名：取该组第一个文件名推断；若重复则追加 (group N)
+            raw_name = uploaded_filenames[idx]
+            legend = self._legend_from_filename(raw_name)
+            if legend in df_average.columns:
+                legend = f"{legend} (group {gi})"
+    
+            df_average[legend] = mean_vals
+            df_sd[legend] = std_vals
+    
+            idx += gsize
+    
+        return df_average, df_sd, x_datas
+    
+    def old_version_calculate_for_error_bar_or_band(self, multi_files, x_name, replica_number, uploaded_filenames):
         df_data = pd.DataFrame()
         df_average = pd.DataFrame()
         df_sd   = pd.DataFrame()
@@ -670,7 +727,7 @@ class plotly_go():
         return ranges
 
 
-    def plotly_multy(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, linewidth, transparency, x_low, x_high, y_low, y_high, trace_color):
+    def plotly_multy(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_counts, axis_show, linewidth, transparency, x_low, x_high, y_low, y_high, trace_color):
         # Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
         Plotly = trace_color
         data, histogram_data, group_labels = [], [], []
@@ -830,7 +887,7 @@ class plotly_go():
         # 使用 plot_graph 绘制图形
         self.plot_graph(data, layout, "Scatter_" + output_name)
 
-    def plotly_free_energy(self, multi_files, output_name, plot_name, nbin, size, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_number, axis_show, linewidth, transparency, x_low, x_high, y_low, y_high, trace_color):
+    def plotly_free_energy(self, multi_files, output_name, plot_name, nbin, size, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_counts, axis_show, linewidth, transparency, x_low, x_high, y_low, y_high, trace_color):
         # Plotly = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
         Plotly = trace_color
         # AMPK_color = ['#222A2A', '#FB0D0D', '#2E91E5'] # black red blue
@@ -2827,7 +2884,7 @@ with plot:
     violin = st.selectbox("violin style", ['False', 'True'])
 
     if st.button('Plotting') and multi_files[0] != 0:
-        x = plotly_go(tmp_path, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, width_size, height_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, margin_l, margin_r, margin_t, margin_b, violin, smooth, error_bar, replica_number, axis_show, line_width, transparency, x_low, x_high, y_low, y_high, trace_color_scheme, pca_color_by_replicas)
+        x = plotly_go(tmp_path, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, width_size, height_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, margin_l, margin_r, margin_t, margin_b, violin, smooth, error_bar, group_sizes, axis_show, line_width, transparency, x_low, x_high, y_low, y_high, trace_color_scheme, pca_color_by_replicas)
 
 # 在第二栏中添加内容
 with mradder:
