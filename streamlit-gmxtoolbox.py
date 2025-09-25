@@ -835,7 +835,7 @@ class plotly_go():
                     labels = [x for x in range(len(y_data))]
                     st.text("15:25")
                     # 使用 define_trace 创建迹线
-                    trace = self.define_trace(x_data, y_data, file, 'rainbow', replica_th=i, flag=flag, labels=labels)  # 假设使用 'rainbow' 作为颜色
+                    trace = self.define_trace(x_data, y_data, file, color[0], replica_th=i, flag=flag, labels=labels)  # 假设使用 'rainbow' 作为颜色
                     data.append(trace)
             elif multi_files[0].endswith(".csv"):
                 for i, trace in enumerate(traces_name_list):
