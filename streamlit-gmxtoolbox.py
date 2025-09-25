@@ -814,7 +814,6 @@ class plotly_go():
 
     def plotly_pca(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l, r, t ,b, smooth, axis_show, linewidth, x_low, x_high, y_low, y_high, trace_color, pca_color_by_replica):
         data = []
-        st.text("15:25")
         if pca_color_by_replica == 0:
             color = ['rainbow']
         elif pca_color_by_replica !=0:
