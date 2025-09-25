@@ -339,7 +339,7 @@ class plotly_go():
         return plot_title, x_name, y_name, traces_name_list
 
 
-    def define_trace(self, x_data, y_data, file_name, colour, replica_th, violine='False', flag=0, labels=0, smooth=0, number_replicas=0):
+    def define_trace(self, x_data, y_data, file_name, colour, replica_th=0, violine='False', flag=0, labels=0, smooth=0, number_replicas=0):
         # 创建并返回迹线
         if flag == 'pca' and smooth != 'true' and number_replicas == 0:
             trace = go.Scatter(
@@ -833,7 +833,7 @@ class plotly_go():
                     labels = [x for x in range(len(y_data))]
                     
                     # 使用 define_trace 创建迹线
-                    trace = self.define_trace(x_data, y_data, file, 'rainbow', 0, flag=flag, labels=labels)  # 假设使用 'rainbow' 作为颜色
+                    trace = self.define_trace(x_data, y_data, file, 'rainbow', flag=flag, labels=labels)  # 假设使用 'rainbow' 作为颜色
                     data.append(trace)
             elif multi_files[0].endswith(".csv"):
                 for i, trace in enumerate(traces_name_list):
@@ -857,7 +857,7 @@ class plotly_go():
                         trace_name = f"{file} · replica-{j+1}"
                         trace = self.define_trace(
                             x_data[a:bb], y_data[a:bb], trace_name,
-                            color[j], j, flag=flag, labels=labels, number_replicas=pca_color_by_replica
+                            color[j], replica_th=j, flag=flag, labels=labels, number_replicas=pca_color_by_replica
                         )
                         data.append(trace)
             layout = self.setup_layout(plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t ,b, x_low, x_high, y_low, y_high, flag=flag, axis_shows=axis_show, line_width=linewidth, replica_th=pca_color_by_replica)
