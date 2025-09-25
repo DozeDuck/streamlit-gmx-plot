@@ -1,14 +1,14 @@
 # r-base
 # r-base-dev
 # r-cran-ggplot2
-libgl1
-libglib2.0-0
-libnss3
-libx11-6
-libxext6
-libxrender1
-libxfixes3
-libxi6
-libxrandr2
-libasound2
-fonts-dejavu-core
+# libgl1
+# libglib2.0-0
+# libnss3
+# libx11-6
+# libxext6
+# libxrender1
+# libxfixes3
+# libxi6
+# libxrandr2
+# libasound2
+# fonts-dejavu-core
