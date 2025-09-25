@@ -1,5 +1,5 @@
-r-base
-r-base-dev
+# r-base
+# r-base-dev
 # r-cran-ggplot2
 libgl1
 libglib2.0-0
