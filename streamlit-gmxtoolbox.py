@@ -351,7 +351,7 @@ class plotly_go():
                     color=labels,  # 设置颜色为标签的数值
                     colorscale=colour,  # 颜色映射，你可以根据需要选择不同的颜色映射
                     colorbar=dict(title='Conformation Number'),  # 添加颜色条
-                ),
+                )
             )
         elif flag == 'pca' and smooth != 'true' and number_replicas != 0:
             trace = go.Scatter(
