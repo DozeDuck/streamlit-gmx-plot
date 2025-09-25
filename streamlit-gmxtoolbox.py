@@ -839,7 +839,7 @@ class plotly_go():
                 for i, trace in enumerate(traces_name_list):
                     x_data, y_data, _ = self.read_data_csv(multi_files[0], "PC1", renumber)
                     labels = [x for x in range(len(y_data[i]))]
-                    trace = self.define_trace(x_data, y_data[i], multi_files[0], 'rainbow', flag=flag, labels=labels)
+                    trace = self.define_trace(x_data, y_data[i], multi_files[0], 'rainbow',replica_th=i, flag=flag, labels=labels)
                     data.append(trace)
             layout = self.setup_layout(plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t ,b, x_low, x_high, y_low, y_high, flag=flag, axis_shows=axis_show, line_width=linewidth)
 
