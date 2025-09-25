@@ -70,6 +70,17 @@ class plotly_go():
     average_value = []
     multi_flag = ''
 
+    import inspect, os, streamlit as st
+    
+    try:
+        fn = self.define_trace
+        sig = inspect.signature(fn)
+        src = inspect.getsourcefile(fn) or inspect.getfile(fn)
+        line = fn.__code__.co_firstlineno
+        st.write(f"define_trace loaded from:\n  {src}:{line}\n  signature: {sig}")
+    except Exception as e:
+        st.write(f"[debug] cannot introspect define_trace: {e}")
+    
     def __init__(self, multi_files, output_name, renumber, rdf_cutoff, average, ls
                  , nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_counts, axis_show, line_width, transparency
                  , x_low, x_high, y_low, y_high, traces_color_schemes, pca_color_by_replicas):
@@ -812,16 +823,6 @@ class plotly_go():
             error_layout = self.setup_layout(plot_title, title_font, x_name, y_name, xy_font, xaxis_size, yaxis_size, font_color, legend_show, legend_font, font_family, grid_show, l, r, t , b, x_low, x_high, y_low, y_high, violine=violin, axis_shows=axis_show, line_width=linewidth)
             self.plot_graph(error_data, error_layout, "error_bar_" + output_name)
 
-    import inspect, os, streamlit as st
-    
-    try:
-        fn = self.define_trace
-        sig = inspect.signature(fn)
-        src = inspect.getsourcefile(fn) or inspect.getfile(fn)
-        line = fn.__code__.co_firstlineno
-        st.write(f"define_trace loaded from:\n  {src}:{line}\n  signature: {sig}")
-    except Exception as e:
-        st.write(f"[debug] cannot introspect define_trace: {e}")
     
     def plotly_pca(self, multi_files, output_name, renumber, rdf_cutoff, average, plot_name, nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, flag, uploaded_filenames, l, r, t ,b, smooth, axis_show, linewidth, x_low, x_high, y_low, y_high, trace_color, pca_color_by_replica):
         data = []
