@@ -70,16 +70,6 @@ class plotly_go():
     average_value = []
     multi_flag = ''
 
-    import inspect, os, streamlit as st
-    
-    try:
-        fn = self.define_trace
-        sig = inspect.signature(fn)
-        src = inspect.getsourcefile(fn) or inspect.getfile(fn)
-        line = fn.__code__.co_firstlineno
-        st.write(f"define_trace loaded from:\n  {src}:{line}\n  signature: {sig}")
-    except Exception as e:
-        st.write(f"[debug] cannot introspect define_trace: {e}")
     
     def __init__(self, multi_files, output_name, renumber, rdf_cutoff, average, ls
                  , nbin, size, move_average, mean_value, histogram, xaxis_name, yaxis_name, xaxis_size, yaxis_size, xy_font, title_font, legend_show, legend_font, font_family, font_color, grid_show, uploaded_filenames, l,r,t,b, violin, smooth, error_bar, replica_counts, axis_show, line_width, transparency
