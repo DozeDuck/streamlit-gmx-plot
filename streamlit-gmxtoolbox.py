@@ -339,7 +339,7 @@ class plotly_go():
         return plot_title, x_name, y_name, traces_name_list
 
 
-    def define_trace(self, x_data, y_data, file_name, colour,  violine='False', flag=0, labels=0, smooth=0, number_replicas=0):
+    def define_trace(self, x_data, y_data, file_name, colour, replica_th=0, violine='False', flag=0, labels=0, smooth=0, number_replicas=0):
         # 创建并返回迹线
         if flag == 'pca' and smooth != 'true' and number_replicas == 0:
             trace = go.Scatter(
