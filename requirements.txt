@@ -6,4 +6,4 @@ matplotlib
 rpy2
 biopython
 zipfile36
-acpype
+# acpype
