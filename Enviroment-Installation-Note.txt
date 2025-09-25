@@ -1,5 +1,7 @@
 Python 3.11.13 in Codespaces / Python 3.11 in Streamlit Cloud
 
+# No packages.txt needed!!!
+
 #### requirements.txt ####
 acpype==2023.10.27
 altair==5.5.0
