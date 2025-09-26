@@ -833,7 +833,6 @@ class plotly_go():
                 for i, file in enumerate(multi_files):          
                     x_data, y_data, _ = self.read_data_xvg(file, "PC1", renumber)  # 假设 "PC1" 和 "PC2" 是合适的轴名称
                     labels = [x for x in range(len(y_data))]
-                    st.text("15:25")
                     # 使用 define_trace 创建迹线
                     trace = self.define_trace(x_data, y_data, file, color[0], replica_th=i, flag=flag, labels=labels)  # 假设使用 'rainbow' 作为颜色
                     data.append(trace)
