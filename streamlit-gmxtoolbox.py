@@ -2881,7 +2881,8 @@ with plot:
     margin_t  = st.number_input("top margin", min_value=0, step=10, value=60)
     margin_b  = st.number_input("bottom margin", min_value=0, step=10, value=100)
     font_color = st.color_picker("Font color", '#000000')
-    trace_color_scheme = st.text_area("Traces Color Scheme", value="#636EFA #EF553B #00CC96 #AB63FA #FFA15A #19D3F3 #FF6692 #B6E880 #FF97FF #FECB52")
+    # trace_color_scheme = st.text_area("Traces Color Scheme", value="#636EFA #EF553B #00CC96 #AB63FA #FFA15A #19D3F3 #FF6692 #B6E880 #FF97FF #FECB52")
+    trace_color_scheme = st.text_area("Traces Color Scheme", value="#2E91E5 #E15F99 #1CA71C #FB0D0D #DA16FF #222A2A #B68100 #750D86 #EB663B #511CFB #00A08B #FB00D1 #FC0080 #B2828D #6C7C32 #778AAE #862A16 #A777F1 #620042 #1616A7 #DA60CA #6C4516 #0D2A63 #AF0038")
     violin = st.selectbox("violin style", ['False', 'True'])
 
     if st.button('Plotting') and multi_files[0] != 0:
