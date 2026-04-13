@@ -3771,7 +3771,8 @@ def adv_render_batch_pymol_module():
                 st.error(f"Failed to save uploaded file: {uploaded.name}")
                 return
             pdb_paths.append(saved_path)
-        pdb_files_name = [uploaded_file.name for uploaded_file in pdb_files]
+        # pdb_files_name = [uploaded_file.name for uploaded_file in pdb_files]
+        pdb_files_name = [os.path.splitext(f.name)[0] for f in pdb_files]
         out_prefix = os.path.join(run_dir, re.sub(r"[^A-Za-z0-9_.-]+", "_", output_prefix).strip("_") or "batch_rmsd")
         try:
             with st.spinner("Running PyMOL pairwise RMSD calculation..."):
