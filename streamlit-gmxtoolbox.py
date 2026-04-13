@@ -3851,7 +3851,7 @@ def adv_density_scatter(rmsd, contacts_values, bins=100, out_png="contacts_vs_rm
     cbar = plt.colorbar(scatter)
     cbar.set_label("log10(local density + 1)")
     plt.xlabel("Contact points (c)")
-    plt.ylabel("RMSD")
+    plt.ylabel("RMSD [nm]")
     plt.title("Density-colored scatter plot")
     plt.tight_layout()
     plt.savefig(out_png, dpi=600)
