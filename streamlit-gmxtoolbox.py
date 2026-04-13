@@ -3721,7 +3721,7 @@ def adv_run_batch_pymol_rmsd_heatmap(pdb_paths, pdb_names, output_prefix, select
 
 
 def adv_render_batch_pymol_module():
-    st.subheader("Batch all-vs-all RMSD heatmap (PyMOL)")
+    st.subheader("Single Frame PDB files RMSD Matrix heatmap (PyMOL)")
     st.caption("Upload multiple PDB files, compute pairwise RMSD with PyMOL, and download TXT/CSV/PNG outputs.")
     pymol_ok, pymol_error = adv_check_pymol_available()
     if not pymol_ok:
