@@ -3664,7 +3664,7 @@ def adv_batch_pymol_plot_heatmap(labels, matrix, out_png, vmin, vmax, annot, dpi
     plt.close(fig)
 
 
-def adv_run_batch_pymol_rmsd_heatmap(pdb_paths, output_prefix, selection, method, cycles, vmin, vmax, annot, dpi, discrete_colorbar, color_interval):
+def adv_run_batch_pymol_rmsd_heatmap(pdb_paths, pdb_names, output_prefix, selection, method, cycles, vmin, vmax, annot, dpi, discrete_colorbar, color_interval):
     try:
         import pymol
         from pymol import cmd
@@ -3683,7 +3683,7 @@ def adv_run_batch_pymol_rmsd_heatmap(pdb_paths, output_prefix, selection, method
     for idx, pdb_path in enumerate(pdb_paths):
         obj_name = f"obj_{idx}"
         cmd.load(str(pdb_path), obj_name)
-        label = os.path.splitext(os.path.basename(pdb_path))[0]
+        label = pdb_names[idx]
         loaded.append((label, obj_name, pdb_path))
 
     labels, matrix = adv_batch_pymol_build_matrix(cmd, loaded, selection, method, cycles)
@@ -3736,6 +3736,7 @@ def adv_render_batch_pymol_module():
         accept_multiple_files=True,
         key="adv_batch_pymol_files",
     )
+    
     output_prefix = st.text_input("Output prefix", value="batch_rmsd", key="adv_batch_pymol_prefix")
     selection = st.text_input(
         "Atom selection",
@@ -3770,11 +3771,13 @@ def adv_render_batch_pymol_module():
                 st.error(f"Failed to save uploaded file: {uploaded.name}")
                 return
             pdb_paths.append(saved_path)
+        pdb_files_name = [uploaded_file.name for uploaded_file in pdb_files]
         out_prefix = os.path.join(run_dir, re.sub(r"[^A-Za-z0-9_.-]+", "_", output_prefix).strip("_") or "batch_rmsd")
         try:
             with st.spinner("Running PyMOL pairwise RMSD calculation..."):
                 outputs, labels, matrix = adv_run_batch_pymol_rmsd_heatmap(
                     pdb_paths,
+                    pdb_files_name,
                     out_prefix,
                     selection,
                     method,
