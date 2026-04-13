@@ -65,5 +65,5 @@ tzlocal==5.3.1
 urllib3==2.5.0
 watchdog==6.0.0
 zipfile36==0.1.3
-plumed
+plumed==2.10
 pymol-open-source
