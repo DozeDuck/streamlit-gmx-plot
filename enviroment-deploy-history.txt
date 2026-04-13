@@ -1,0 +1,363 @@
+[     UTC     ] Logs for app-gmx-tool-box.streamlit.app/
+
+────────────────────────────────────────────────────────────────────────────────────────
+
+[13:12:07] 🖥 Provisioning machine...
+
+[13:12:07] 🎛 Preparing system...
+
+[13:12:07] ⛓ Spinning up manager process...
+
+[13:11:29] 🚀 Starting up repository: 'streamlit-gmx-plot', branch: 'main', main module: 'streamlit-gmxtoolbox.py'
+
+[13:11:29] 🐙 Cloning repository...
+
+[13:11:31] 🐙 Cloning into '/mount/src/streamlit-gmx-plot'...
+
+[13:11:32] 🐙 Cloned repository!
+
+[13:11:32] 🐙 Pulling code changes from Github...
+
+[13:11:33] 📦 Processing dependencies...
+
+[13:11:33] 📦 Apt dependencies were installed from /mount/src/streamlit-gmx-plot/packages.txt using apt-get.
+
+Get:1 http://deb.debian.org/debian-security bullseye-security InRelease [27.2 kB]
+
+Hit:2 http://deb.debian.org/debian trixie InRelease
+
+Get:3 http://deb.debian.org/debian trixie-updates InRelease [47.3 kB]
+
+Get:4 http://deb.debian.org/debian-security trixie-security InRelease [43.4 kB]
+
+Get:5 https://packages.microsoft.com/debian/11/prod bullseye InRelease [3650 B]
+
+Get:6 http://deb.debian.org/debian-security bullseye-security/main amd64 Packages [446 kB]
+
+Get:7 http://deb.debian.org/debian-security trixie-security/main amd64 Packages [122 kB]
+
+Get:8 https://packages.microsoft.com/debian/11/prod bullseye/main arm64 Packages [71.7 kB]
+
+Get:9 https://packages.microsoft.com/debian/11/prod bullseye/main amd64 Packages [214 kB]
+
+Fetched 976 kB in 1s (1751 kB/s)
+
+Reading package lists...[2026-04-13 13:11:36.362654] 
+
+Reading package lists...[2026-04-13 13:11:38.621832] 
+
+Building dependency tree...[2026-04-13 13:11:39.022626] 
+
+Reading state information...[2026-04-13 13:11:39.023551] 
+
+0 upgraded, 0 newly installed, 0 to remove and 4 not upgraded.
+
+
+──────────────────────────────────────── uv ───────────────────────────────────────────
+
+
+Using uv pip install.
+
+Using Python 3.11.15 environment at /home/adminuser/venv
+
+Resolved [2026-04-13 13:11:46.404303] 65 packages in 5.14s
+
+[13:12:08] 🚀 Starting up repository: 'streamlit-gmx-plot', branch: 'main', main module: 'streamlit-gmxtoolbox.py'
+
+[13:12:08] 🐙 Cloning repository...
+
+[13:12:10] 🐙 Cloning into '/mount/src/streamlit-gmx-plot'...
+
+[13:12:10] 🐙 Cloned repository!
+
+[13:12:10] 🐙 Pulling code changes from Github...
+
+[13:12:11] 📦 Processing dependencies...
+
+[13:12:11] 📦 Apt dependencies were installed from /mount/src/streamlit-gmx-plot/packages.txt using apt-get.
+
+Get:1 http://deb.debian.org/debian-security bullseye-security InRelease [27.2 kB]
+
+Hit:2 http://deb.debian.org/debian trixie InRelease
+
+Get:3 http://deb.debian.org/debian trixie-updates InRelease [47.3 kB]
+
+Get:4 http://deb.debian.org/debian-security trixie-security InRelease [43.4 kB]
+
+Get:5 http://deb.debian.org/debian-security bullseye-security/main amd64 Packages [446 kB]
+
+Get:6 https://packages.microsoft.com/debian/11/prod bullseye InRelease [3650 B]
+
+Get:7 http://deb.debian.org/debian-security trixie-security/main amd64 Packages [122 kB]
+
+Get:8 https://packages.microsoft.com/debian/11/prod bullseye/main arm64 Packages [71.7 kB]
+
+Get:9 https://packages.microsoft.com/debian/11/prod bullseye/main amd64 Packages [214 kB]
+
+Fetched 976 kB in 0s (4165 kB/s)
+
+Reading package lists...[2026-04-13 13:12:12.798184] 
+
+Reading package lists...[2026-04-13 13:12:13.675068] 
+
+Building dependency tree...[2026-04-13 13:12:13.940449] 
+
+Reading state information...[2026-04-13 13:12:13.940868] 
+
+0 upgraded, 0 newly installed, 0 to remove and 4 not upgraded.
+
+
+──────────────────────────────────────── uv ───────────────────────────────────────────
+
+
+Using uv pip install.
+
+Using Python 3.11.15 environment at /home/adminuser/venv
+
+Resolved 65 packages in 1.48s
+
+Prepared 65 packages in 27.46s
+
+Installed 65 packages in 172ms
+
+ + acpype==2023.10.27
+
+ + altair==5.5.0
+
+ + attrs==25.3.0
+
+ + biopython==1.85
+
+ + blinker==1.9.0
+
+ + cachetools==6.2.0
+
+ + certifi==2025.8.3
+
+ + cffi==2.0.0
+
+ + charset-normalizer==3.4.3
+
+ + click==8.3.0
+
+ + contourpy==1.3.3
+
+ + cycler==0.12.1
+
+ + filelock==3.19.1[2026-04-13 13:12:44.534800] 
+
+ + fonttools==4.60.0
+
+ + gitdb==4.0.12
+
+ + gitpython==3.1.41
+
+ + griddataformats==1.0.2
+
+ + idna==3.10
+
+ + [2026-04-13 13:12:44.535036] jinja2==3.1.6
+
+ + joblib==1.5.2
+
+ + jsonschema==4.25.1
+
+ + jsonschema-specifications==2025.9.1
+
+ + kaleido==0.2.1
+
+ + kiwisolver==1.4.9
+
+ + markupsafe==3.0.2
+
+ + matplotlib==3.10.6
+
+ [2026-04-13 13:12:44.535242] + mda-xdrlib==0.2.0
+
+ + mdanalysis==2.9.0
+
+ + mmtf-python==1.1.3
+
+ + mrcfile==1.5.4
+
+ + msgpack==1.1.1
+
+ + narwhals==2.5.0
+
+ + numpy==2.3.3
+
+ + openbabel-wheel==3.1.1.22
+
+ + packaging==25.0
+
+ + pandas==2.3.2
+
+ + pillow==11.3.0
+
+ +[2026-04-13 13:12:44.535423]  plotly==6.3.0
+
+ + plumed==2.10.0
+
+ + protobuf==6.32.1
+
+ + pyarrow==21.0.0
+
+ + pycparser==2.23
+
+ + pydeck==0.9.1
+
+ + pymol-open-source==3.2.0a0
+
+ + pyparsing==3.2.5[2026-04-13 13:12:44.535537] 
+
+ + python-dateutil==2.9.0.post0
+
+ + pytz==2025.2
+
+ + referencing==0.36.2
+
+ + requests==2.32.5
+
+ + rpds-py==0.27.1
+
+ + scipy==1.16.2
+
+ + six[2026-04-13 13:12:44.535712] ==1.17.0
+
+ + smmap==5.0.2
+
+ + streamlit==1.50.0
+
+ + tenacity==9.1.2
+
+ + threadpoolctl==3.6.0
+
+ + toml==0.10.2
+
+ + tornado==6.5.2
+
+ + tqdm==4.67.1
+
+ + typing-extensions==4.15.0
+
+ + tzdata==2025.2
+
+ + tzlocal==5.3.1
+
+ + urllib3==[2026-04-13 13:12:44.536051] 2.5.0
+
+ + watchdog==6.0.0
+
+ + zipfile36==0.1.3
+
+Checking if Streamlit is installed
+
+Found Streamlit version 1.50.0 in the environment
+
+Installing rich for an improved exception logging
+
+Using uv pip install.
+
+Using Python 3.11.15 environment at /home/adminuser/venv
+
+Resolved 4 packages in 128ms
+
+Prepared 4 packages in 154ms
+
+Installed 4 packages in 13ms
+
+ +[2026-04-13 13:12:46.259888]  markdown-it-py==4.0.0
+
+ + mdurl==0.1.2
+
+ + pygments==2.20.0
+
+ + rich==15.0.0
+
+
+────────────────────────────────────────────────────────────────────────────────────────
+
+
+[13:12:47] 🐍 Python dependencies were installed from /mount/src/streamlit-gmx-plot/requirements.txt using uv.
+
+Check if streamlit is installed
+
+Streamlit is already installed
+
+[13:12:48] 📦 Processed dependencies!
+
+
+
+
+[13:14:30] 🐙 Pulling code changes from Github...
+
+[13:14:31] 📦 Processing dependencies...
+
+[13:14:31] 📦 Apt dependencies were installed from /mount/src/streamlit-gmx-plot/packages.txt using apt-get.
+
+[13:14:31] 📦 Processed dependencies!
+
+[13:14:32] 🔄 Updated app!
+
+[13:14:32] 🐙 Pulling code changes from Github...
+
+[13:14:33] 📦 Processing dependencies...
+
+[13:14:33] 📦 Apt dependencies were installed from /mount/src/streamlit-gmx-plot/packages.txt using apt-get.
+
+[13:14:33] 📦 Processed dependencies!
+
+[13:14:35] 🔄 Updated app!
+
+[13:14:37] 🐙 Pulling code changes from Github...
+
+[13:14:39] 📦 Processing dependencies...
+
+[13:14:39] 📦 Apt dependencies were installed from /mount/src/streamlit-gmx-plot/packages.txt using apt-get.
+
+
+──────────────────────────────────────── uv ───────────────────────────────────────────
+
+
+Using uv pip install.
+
+Using Python 3.11.15 environment at /home/adminuser/venv
+
+Resolved 65 packages in 182ms
+
+Audited 65 packages in 0.11ms
+
+Checking if Streamlit is installed
+
+[13:14:40] 🔌 Disconnecting...
+
+Found Streamlit version 1.50.0 in the environment
+
+Installing rich for an improved exception logging
+
+Using uv pip install.
+
+Using Python 3.11.15 environment at /home/adminuser/venv
+
+Audited 1 package in 2ms
+
+
+────────────────────────────────────────────────────────────────────────────────────────
+
+
+[13:14:40] 🐍 Python dependencies were installed from /mount/src/streamlit-gmx-plot/requirements.txt using uv.
+
+[13:14:40] 📦 Processed dependencies!
+
+  Stopping...
+
+[13:14:40] 🖥 Provisioning machine...
+
+[13:14:40] 🎛 Preparing system...
+
+[13:14:40] ⛓ Spinning up manager process...
+
+
+
+
+[13:14:43] 🔄 Updated app!
