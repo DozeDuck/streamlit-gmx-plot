@@ -3883,14 +3883,17 @@ class MDRMSDStudio:
         self.check_dependencies(analysis_only)
         if not 1 <= len(rows) <= 4:
             raise ValueError('Please specify between 1 and 4 tracks.')
-        if options.get('x_axis') == 'temperature' and shared_mdp is None:
-            raise ValueError('Temperature axis requires an annealing .mdp file.')
+        if analysis_only and options.get('no_export_csv') and options.get('no_export_plot') and options.get('preview_at_ns') is None:
+            raise ValueError('Analysis-only requires a CSV, PNG, or preview export. Enable one output.')
+        if options.get('x_axis') == 'temperature' and shared_mdp is None and not all(r.get('mdp') is not None for r in rows):
+            raise ValueError('Temperature X-axis requires a shared annealing .mdp or an individual MDP for every track.')
         unknown = set(options) - self.VALID_OPTIONS
         if unknown:
             raise ValueError(f'Unknown processing parameters: {sorted(unknown)}')
 
         uploads = ([r.get('rmsd') for r in rows] +
-                   [r.get('time_map') for r in rows if r.get('time_map') is not None])
+                   [r.get('time_map') for r in rows if r.get('time_map') is not None] +
+                   [r.get('mdp') for r in rows if r.get('mdp') is not None])
         if not analysis_only:
             if combined_movie is not None:
                 uploads.append(combined_movie)
@@ -3927,9 +3930,9 @@ class MDRMSDStudio:
                     'label': (str(row.get('label') or f'Track {i}').strip())[:70],
                     'rmsd': str(rmsd_path),
                     'color': str(row.get('color', '#272A31')),
-                    'time_unit': options.get('xvg_time_unit', 'auto'),
-                    'rmsd_unit': options.get('rmsd_unit', 'nm'),
-                    'zoom': float(options.get('movie_zoom', 1.0)),
+                    'time_unit': row.get('time_unit', options.get('xvg_time_unit', 'auto')),
+                    'rmsd_unit': row.get('rmsd_unit', options.get('rmsd_unit', 'nm')) ,
+                    'zoom': float(row.get('zoom', options.get('movie_zoom', 1.0))),
                 }
                 if not analysis_only and combined_movie is None:
                     movie_upload = row.get('movie')
@@ -3939,6 +3942,11 @@ class MDRMSDStudio:
                     movie_path = self._write_uploaded(
                         movie_upload, input_dir / f'{i:02d}_movie{suffix}', {'.mp4', '.mov', '.mkv', '.webm'})
                     record['movie'] = str(movie_path)
+                if row.get('mdp') is not None:
+                    record['mdp'] = str(self._write_uploaded(
+                        row['mdp'], input_dir / f'{i:02d}_annealing.mdp', {'.mdp'}))
+                    record['annealing_group'] = int(row.get('annealing_group', options.get('annealing_group', 1)))
+                    record['mdp_time_offset_ns'] = float(row.get('mdp_time_offset_ns', options.get('mdp_time_offset_ns', 0.0)))
                 if row.get('time_map') is not None:
                     if combined_movie is not None:
                         raise ValueError('Independent time maps are not supported with a combined movie.')
@@ -5403,6 +5411,7 @@ def render_md_rmsd_studio_module():
     import shutil as _shutil
 
     st.subheader('MD RMSD Studio | Synchronised trajectory movies')
+    st.success('All v6 analysis settings are available below. The **Plot & analysis** tab opens first, including Gaussian / moving-average filtering and the annealing .mdp uploader.')
     st.caption('Combine 1–4 RMSD traces and MD movies. Supports standard MD, folding/refolding, '
                'pulling, metadynamics, and annealing/deannealing.')
     st.info('For Streamlit Community Cloud, start with 960×540 or 1280×720 and short MP4 clips. '
@@ -5420,7 +5429,7 @@ def render_md_rmsd_studio_module():
         analysis_only = st.checkbox('Plots + CSV only (skip MP4)', value=False,
                                     key=state_prefix+'analysis')
 
-    input_tab, analysis_tab, video_tab = st.tabs(['1. Upload trajectories', '2. Plot & analysis', '3. Video & layout'])
+    analysis_tab, input_tab, video_tab = st.tabs(['1. Plot & analysis · smoothing & MDP', '2. Upload trajectories', '3. Video & layout'])
     rows = []
     shared_movie = None
     mdp_upload = None
@@ -5476,6 +5485,41 @@ def render_md_rmsd_studio_module():
                     entry['time_map'] = st.file_uploader(
                         'Video seconds → simulation ns (.csv)', type=['csv'],
                         key=f'{state_prefix}timemap_{i}')
+                with st.expander(f'Advanced settings — Track {i+1}: independent MDP, units and zoom', expanded=False):
+                    entry['mdp'] = st.file_uploader(
+                        'Track-specific annealing .mdp (overrides shared MDP)',
+                        type=['mdp'], key=f'{state_prefix}mdp_{i}',
+                        help='Optional. If omitted, the shared MDP on the Plot & analysis tab is used.')
+                    if entry['mdp'] is not None:
+                        group_col, offset_col = st.columns(2)
+                        with group_col:
+                            entry['annealing_group'] = int(st.number_input(
+                                'Track MDP temperature group', min_value=1, max_value=20,
+                                value=1, step=1, key=f'{state_prefix}mdp_group_{i}'))
+                        with offset_col:
+                            entry['mdp_time_offset_ns'] = st.number_input(
+                                'Track MDP time offset (ns)', value=0.0,
+                                step=0.1, key=f'{state_prefix}mdp_offset_{i}')
+                    z_col, u_col, r_col = st.columns(3)
+                    with z_col:
+                        independent_zoom = st.checkbox('Override global zoom', value=False,
+                            key=f'{state_prefix}zoom_override_{i}')
+                        if independent_zoom:
+                            entry['zoom'] = float(st.number_input(
+                                'Track movie zoom', min_value=1.0, max_value=4.0,
+                                value=1.25, step=0.05, key=f'{state_prefix}zoom_{i}'))
+                    with u_col:
+                        entry['time_unit'] = st.selectbox('Track XVG time unit',
+                            ['inherit', 'auto', 'ps', 'ns'],
+                            key=f'{state_prefix}time_unit_{i}')
+                    with r_col:
+                        entry['rmsd_unit'] = st.selectbox('Track RMSD unit',
+                            ['inherit', 'nm', 'angstrom'],
+                            key=f'{state_prefix}rmsd_unit_{i}')
+                    if entry['time_unit'] == 'inherit':
+                        entry.pop('time_unit', None)
+                    if entry['rmsd_unit'] == 'inherit':
+                        entry.pop('rmsd_unit', None)
                 rows.append(entry)
         if video_mode == 'One combined MP4' and not analysis_only:
             shared_movie = st.file_uploader(
@@ -5498,8 +5542,9 @@ def render_md_rmsd_studio_module():
             x_axis = st.selectbox('X-axis', ['time', 'temperature'],
                                   format_func=lambda v: 'Simulation time (ns)' if v == 'time' else 'Programmed temperature (K)',
                                   key=state_prefix+'x_axis')
-        st.markdown('**Optional GROMACS annealing program**')
-        mdp_upload = st.file_uploader('Annealing .mdp (required for Temperature X-axis; optional for time overlay)',
+        st.markdown('**GROMACS temperature programme (.mdp)**')
+        st.caption('Use the shared MDP uploader below for all trajectories, or use each track’s advanced settings to supply different .mdp files. The temperature axis requires a varying annealing schedule.')
+        mdp_upload = st.file_uploader('Shared annealing .mdp (Temperature X-axis / temperature overlay)',
                                       type=['mdp'], key=state_prefix+'mdp')
         a1, a2 = st.columns(2)
         with a1:
@@ -5522,7 +5567,8 @@ def render_md_rmsd_studio_module():
             with t2:
                 global_end = st.number_input('Shared end (ns)', value=26.0, step=0.1,
                                              key=state_prefix+'gend')
-        st.markdown('**Independent filtering / smoothing**')
+        st.markdown('### RMSD trace, dot and derivative smoothing')
+        st.caption('Choose **none**, **Gaussian**, or **moving-average** separately for the displayed trace and the derivative. Match-trace keeps dots on the displayed trace. Window values are in MD ns (Gaussian σ vs moving-average full window).')
         a, b, c = st.columns(3)
         smooth_choices = ['none', 'gaussian', 'moving-average']
         with a:
@@ -5545,6 +5591,7 @@ def render_md_rmsd_studio_module():
             derivative_window = st.number_input('Derivative window / σ (ns)', min_value=0.0,
                                                 max_value=100.0, value=0.40, step=0.05,
                                                 key=state_prefix+'deriv_window')
+        st.markdown('**Additional plot appearance**')
         raw_visible = st.checkbox('Display faint unsmoothed RMSD trace', value=True,
                                   key=state_prefix+'raw_visible')
         dot_path = st.checkbox('Draw dashed dot path when different from visible trace',
@@ -5576,6 +5623,19 @@ def render_md_rmsd_studio_module():
                                       key=state_prefix+'dymax')
             dylim = [float(dy0), float(dy1)]
 
+        manual_xlim = st.checkbox('Set X-axis limits manually (ns or K)', value=False,
+                                  key=state_prefix+'do_xlim')
+        xlim = None
+        if manual_xlim:
+            xlo_col, xhi_col = st.columns(2)
+            with xlo_col:
+                xlo = st.number_input('X min (ns or K)', value=300.0 if x_axis == 'temperature' else 0.0,
+                                      key=state_prefix+'x_min')
+            with xhi_col:
+                xhi = st.number_input('X max (ns or K)', value=900.0 if x_axis == 'temperature' else 26.0,
+                                      key=state_prefix+'x_max')
+            xlim = [float(xlo), float(xhi)]
+
     with video_tab:
         title = st.text_input('Video / chart title', value='MD RMSD Studio',
                               key=state_prefix+'title')
@@ -5595,7 +5655,7 @@ def render_md_rmsd_studio_module():
                                    value=0.38, step=0.01, key=state_prefix+'plot_ratio')
         with b:
             movie_zoom = st.slider('Movie crop/zoom factor', min_value=1.0,
-                                   max_value=3.0, value=1.0, step=0.05,
+                                   max_value=4.0, value=1.0, step=0.05,
                                    key=state_prefix+'zoom')
         with c:
             movie_layout = st.selectbox('Movie arrangement', ['auto', 'row', 'grid', 'column'],
@@ -5608,7 +5668,7 @@ def render_md_rmsd_studio_module():
             crf = st.number_input('MP4 quality (CRF, lower=better)', min_value=16,
                                   max_value=36, value=23, key=state_prefix+'crf')
         with c:
-            preset = st.selectbox('Encoding speed', ['ultrafast', 'superfast', 'veryfast', 'faster', 'fast'],
+            preset = st.selectbox('Encoding speed', ['ultrafast', 'superfast', 'veryfast', 'faster', 'fast', 'medium', 'slow'],
                                   index=2, key=state_prefix+'preset')
         movie_bg = st.selectbox('Movie letterbox colour', ['white', 'black'],
                                 key=state_prefix+'bg')
@@ -5616,8 +5676,21 @@ def render_md_rmsd_studio_module():
                                    key=state_prefix+'use_duration')
         duration = st.number_input('Duration (s)', min_value=1.0, max_value=120.0,
                                    value=20.0, step=1.0, key=state_prefix+'duration') if use_duration else None
+        st.markdown('**Output files & preview**')
+        export_csv = st.checkbox('Export per-track analysis CSV', value=True,
+                                 key=state_prefix+'export_csv')
+        export_plots = st.checkbox('Export static plot PNG', value=True,
+                                   key=state_prefix+'export_plots')
+        use_preview_at = st.checkbox('Save composite preview at a selected simulation time (ns)',
+                                     value=False, key=state_prefix+'use_preview')
+        preview_at = st.number_input('Preview at simulation time (ns)',
+                                     value=0.0, step=0.5, key=state_prefix+'preview_at') if use_preview_at else None
+        st.caption('This preview is an analysis/chart layout preview (not an embedded movie frame).')
         st.caption('Each video is mapped uniformly to the output playback duration. Use a per-track CSV '
                    'time map if movie frames were sampled irregularly in simulation time.')
+
+    if analysis_only and not export_csv and not export_plots and preview_at is None:
+        st.warning('Analysis-only with CSV and PNG both disabled will produce no normal output. Enable at least one export.')
 
     if st.button('Generate synchronized MD video / analysis', key=state_prefix+'run',
                  type='primary', use_container_width=True):
@@ -5633,7 +5706,9 @@ def render_md_rmsd_studio_module():
             'derivative_smoothing': derivative_smooth, 'derivative_window_ns': float(derivative_window),
             'hide_raw_trace': not raw_visible, 'no_dot_path': not dot_path,
             'no_cursor': not axis_cur, 'no_time_overlay': not overlay,
-            'ylim': ylim, 'derivative_ylim': dylim,
+            'ylim': ylim, 'derivative_ylim': dylim, 'xlim': xlim,
+            'no_export_csv': not export_csv, 'no_export_plot': not export_plots,
+            'preview_at_ns': preview_at,
             'plot_ratio': float(plot_ratio), 'movie_zoom': float(movie_zoom),
             'movie_layout': movie_layout, 'movie_bg': movie_bg, 'fps': float(fps),
             'duration': duration, 'width': int(width), 'height': int(height),
